@@ -38,10 +38,12 @@ public class UserController {
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@GetMapping("/users/{id}")
-	public ResponseEntity<User> getUsersById(@PathVariable(value = "id") String gmail)
+	public ResponseEntity<User> getUsersById(@PathVariable(value = "id") int id)
 			throws ResourceNotFoundException {
-		User user = userRepository.findById(gmail)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + gmail));
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + id));
 		return ResponseEntity.ok().body(user);
 	}
+	
+	
 }

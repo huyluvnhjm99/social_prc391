@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="ISO-8859-1">
 <title>Home PAge</title>
-<link rel="icon" href="https://lh3.googleusercontent.com/proxy/xWtydQosAs-9LtJfAGUKgB4OmigjICZzj9tk8MxP7KXl4Uy0kmFzkJwetKJoRtScN7tCLLEJCMbtL2l1HXDqmPmRNrbyLboJ69NzhhetMWIiWMmlsA">
+<link rel="icon"
+	href="https://lh3.googleusercontent.com/proxy/xWtydQosAs-9LtJfAGUKgB4OmigjICZzj9tk8MxP7KXl4Uy0kmFzkJwetKJoRtScN7tCLLEJCMbtL2l1HXDqmPmRNrbyLboJ69NzhhetMWIiWMmlsA">
 </head>
 <body>
 	<pre>
@@ -15,5 +16,5 @@
 			 =========|_|==============|___/=/_/_/_/
 	</pre>
 	<h2>Demo Kubernestes on Google Cloud</h2>
+	<div th:if="${userInfo != null}" th:utext="${userInfo}"></div>
 </body>
-</html>
