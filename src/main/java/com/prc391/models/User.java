@@ -2,7 +2,9 @@ package com.prc391.models;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,7 +19,7 @@ import javax.persistence.Table;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "user")
+@Table(name = "[user]")
 @EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable {
 
@@ -33,14 +35,9 @@ public class User implements Serializable {
 	
 	// Quan hệ 1-n với đối tượng ở dưới (Post) (1 user có nhiều post)
     // MappedBy trỏ tới tên biến Address ở trong Person.
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	private Collection<Post> posts;
-	
-	@OneToMany(mappedBy = "user")
-	private Collection<Comment> comments;
-	
-	@OneToMany(mappedBy = "user")
-	private Collection<Reaction> reactions;
+	//@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany
+	private List<Post> posts = new ArrayList<Post>();
 
     @Column(name = "username", nullable = false, length = 32)
     private String username;
@@ -141,30 +138,6 @@ public class User implements Serializable {
 		this.status = status;
 	}
 
-	public Collection<Post> getPosts() {
-		return posts;
-	}
-
-	public void setPosts(Collection<Post> posts) {
-		this.posts = posts;
-	}
-
-	public Collection<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(Collection<Comment> comments) {
-		this.comments = comments;
-	}
-
-	public Collection<Reaction> getReactions() {
-		return reactions;
-	}
-
-	public void setReactions(Collection<Reaction> reactions) {
-		this.reactions = reactions;
-	}
-
 	public String getRole() {
 		return role;
 	}
@@ -177,9 +150,53 @@ public class User implements Serializable {
 		return serialVersionUID;
 	}
 
-	
+	public User() {
+		super();
+	}
 
-    
+	public User(int id, String username, String password, String avatarLink, String fullname, Date birthdate,
+			String gmail, String facebook, boolean status, String role) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.avatarLink = avatarLink;
+		this.fullname = fullname;
+		this.birthdate = birthdate;
+		this.gmail = gmail;
+		this.facebook = facebook;
+		this.status = status;
+		this.role = role;
+	}
 
+	public User(int id, List<Post> posts, String username, String password, String avatarLink, String fullname,
+			Date birthdate, String gmail, String facebook, boolean status, String role) {
+		super();
+		this.id = id;
+		this.posts = posts;
+		this.username = username;
+		this.password = password;
+		this.avatarLink = avatarLink;
+		this.fullname = fullname;
+		this.birthdate = birthdate;
+		this.gmail = gmail;
+		this.facebook = facebook;
+		this.status = status;
+		this.role = role;
+	}
+
+	public User(int id, String username, String avatarLink, String fullname, Date birthdate, String gmail,
+			String facebook, boolean status, String role) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.avatarLink = avatarLink;
+		this.fullname = fullname;
+		this.birthdate = birthdate;
+		this.gmail = gmail;
+		this.facebook = facebook;
+		this.status = status;
+		this.role = role;
+	}
 }
 

@@ -6,14 +6,17 @@ import java.util.Collection;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "[post]")
 public class Post implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -23,15 +26,15 @@ public class Post implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id")
 	private User user;
 	
-	@OneToMany(mappedBy = "post")
-	private Collection<Comment> comments;
-	
-	@OneToMany(mappedBy = "post")
-	private Collection<Reaction> reactions;
+//	@OneToMany(mappedBy = "post")
+//	private Collection<Comment> comments;
+//	
+//	@OneToMany(mappedBy = "post")
+//	private Collection<Reaction> reactions;
 	
     @Column(name = "post_content", nullable = true, length = 1024)
     private String content;
@@ -106,6 +109,32 @@ public class Post implements Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public Post(int id, User user, String content, String imageLink, String videoLink, Date dateUpdated,
+			boolean status) {
+		super();
+		this.id = id;
+		this.user = user;
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.status = status;
+	}
+
+	public Post() {
+		super();
+	}
+
+	public Post(int id, String content, String imageLink, String videoLink, Date dateUpdated, boolean status) {
+		super();
+		this.id = id;
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.status = status;
 	}
     
     
