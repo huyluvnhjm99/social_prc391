@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -27,11 +29,6 @@ public class User implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	@Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
 	
 	// Quan hệ 1-n với đối tượng ở dưới (Post) (1 user có nhiều post)
     // MappedBy trỏ tới tên biến Address ở trong Person.
@@ -39,40 +36,45 @@ public class User implements Serializable {
 	@OneToMany
 	private List<Post> posts = new ArrayList<Post>();
 
+	@Id
+	@NotBlank
+	@Size(min = 6, max = 32)
     @Column(name = "username", nullable = false, length = 32)
     private String username;
 
+	@NotBlank
+	@Size(min = 6, max = 255)
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "avatar_link", nullable = true, length = 1024)
+	@NotBlank
+	@Size(max = 1024)
+    @Column(name = "avatar_link", nullable = true)
     private String avatarLink;
     
-    @Column(name = "fullname", nullable = false, length = 64)
+	@NotBlank
+	@Size(min = 6, max = 64)
+    @Column(name = "fullname", nullable = false)
     private String fullname;
     
-    @Column(name = "birthday", nullable = true)
+	@NotBlank
+    @Column(name = "birthday")
     private Date birthdate;
     
-    @Column(name = "gmail", nullable = true, length = 128)
+	@Size(max = 128)
+    @Column(name = "gmail", nullable = true)
     private String gmail;
     
-    @Column(name = "facebook", nullable = true, length = 128)
+	@Size(max = 128)
+    @Column(name = "facebook", nullable = true)
     private String facebook;
    
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private boolean status;
     
-    @Column(name = "role", nullable = false, length = 16)
+    @Size(max = 16)
+    @Column(name = "role", length = 16)
     private String role;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public String getUsername() {
 		return username;
@@ -154,10 +156,9 @@ public class User implements Serializable {
 		super();
 	}
 
-	public User(int id, String username, String password, String avatarLink, String fullname, Date birthdate,
+	public User(String username, String password, String avatarLink, String fullname, Date birthdate,
 			String gmail, String facebook, boolean status, String role) {
 		super();
-		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.avatarLink = avatarLink;
@@ -169,10 +170,9 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public User(int id, List<Post> posts, String username, String password, String avatarLink, String fullname,
+	public User(List<Post> posts, String username, String password, String avatarLink, String fullname,
 			Date birthdate, String gmail, String facebook, boolean status, String role) {
 		super();
-		this.id = id;
 		this.posts = posts;
 		this.username = username;
 		this.password = password;
@@ -185,10 +185,9 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public User(int id, String username, String avatarLink, String fullname, Date birthdate, String gmail,
+	public User(String username, String avatarLink, String fullname, Date birthdate, String gmail,
 			String facebook, boolean status, String role) {
 		super();
-		this.id = id;
 		this.username = username;
 		this.avatarLink = avatarLink;
 		this.fullname = fullname;

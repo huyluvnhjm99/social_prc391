@@ -1,6 +1,8 @@
 package com.prc391.controllers;
 
 import java.security.Principal;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,10 +14,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.prc391.models.Comment;
 import com.prc391.models.Post;
 import com.prc391.models.UserDetails;
 import com.prc391.service.PostServiceImpl;
 import com.prc391.utils.WebUtils;
+import com.sun.istack.Nullable;
 
 @Controller
 public class HomeController {
@@ -24,7 +28,10 @@ public class HomeController {
 	private PostServiceImpl postService;
 
 	@RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET) 
-    public String home(Model model){
+    public String home(Model model, @Nullable Principal principal){
+		if(principal != null) {
+			return "redirect:/homepage";
+		}
         return "login"; 
     } 
 	
@@ -32,11 +39,24 @@ public class HomeController {
     public String homepage(Model model, Principal principal){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
 		
-		List<Post> listPost = postService.loadAllPost();		
+		List<Post> listPost = postService.loadAllPost();
+		for (int i = 0; i < listPost.size(); i++) {
+			if(listPost.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
+				listPost.get(i).setDateUpdated(null);
+			}
+		}
+
+		
 		model.addAttribute("listPosts", listPost);
 		model.addAttribute("userDTO", userdetails.getUser());
         return "homepage"; 
     } 
+	
+	@RequestMapping("/register") 
+    public String register(Model model, Principal principal){
+
+        return "register"; 
+    }
 	
 	@RequestMapping("/profile") 
     public String profile(Model model, Principal principal){

@@ -22,12 +22,16 @@ public class Reaction implements Serializable {
     private int id;
 	
 	@ManyToOne
-	@JoinColumn(name="user_id")
+	@JoinColumn(name="user_username")
 	private User user;
 	
 	@ManyToOne
 	@JoinColumn(name="post_id")
 	private Post post;
+	
+	@ManyToOne
+	@JoinColumn(name="comment_id")
+	private Comment comment;
 	
 	@Column(name = "reaction", nullable = false, length = 16)
     private String reaction;

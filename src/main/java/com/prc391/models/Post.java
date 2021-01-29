@@ -2,7 +2,9 @@ package com.prc391.models;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Time;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,15 +28,15 @@ public class Post implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="user_id")
+	@ManyToOne
+	@JoinColumn(name="user_username")
 	private User user;
 	
-//	@OneToMany(mappedBy = "post")
-//	private Collection<Comment> comments;
-//	
-//	@OneToMany(mappedBy = "post")
-//	private Collection<Reaction> reactions;
+	@OneToMany(mappedBy = "post")
+	private List<Comment> comments;
+	
+	@OneToMany(mappedBy = "post")
+	private Collection<Reaction> reactions;
 	
     @Column(name = "post_content", nullable = true, length = 1024)
     private String content;
@@ -47,9 +49,36 @@ public class Post implements Serializable {
     
     @Column(name = "date_updated", nullable = false)
     private Date dateUpdated;
+    
+    @Column(name = "time_updated", nullable = false)
+    private Time timeUpdated;
 
     @Column(name = "status", nullable = false)
     private boolean status;
+
+	public List<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public Collection<Reaction> getReactions() {
+		return reactions;
+	}
+
+	public void setReactions(Collection<Reaction> reactions) {
+		this.reactions = reactions;
+	}
+
+	public Time getTimeUpdated() {
+		return timeUpdated;
+	}
+
+	public void setTimeUpdated(Time timeUpdated) {
+		this.timeUpdated = timeUpdated;
+	}
 
 	public int getId() {
 		return id;

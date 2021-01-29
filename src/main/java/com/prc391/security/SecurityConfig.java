@@ -65,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable().authorizeRequests();
 			
 		// Các trang không yêu cầu login
-		http.authorizeRequests().antMatchers("/", "/login", "/error", "/static/**", "/login-ex.html").permitAll();
+		http.authorizeRequests().antMatchers("/", "/login", "/error", "/static/**", "/register").permitAll();
 		
 
 		// Trang /userInfo yêu cầu phải login với vai trò ROLE_USER hoặc ROLE_ADMIN.
@@ -88,7 +88,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				// Submit URL của trang login
 				.successHandler(successHandler)
 				.loginProcessingUrl("/j_spring_security_check") // Submit URL
-				.loginPage("/login-ex")//	
+				.loginPage("/login")//	
 				.failureUrl("/login?error=true")//
 				.usernameParameter("username")//
 				.passwordParameter("password")

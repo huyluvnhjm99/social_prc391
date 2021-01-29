@@ -2,6 +2,8 @@ package com.prc391.models;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Time;
+import java.util.Collection;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Comment implements Serializable {
@@ -21,25 +24,47 @@ public class Comment implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 	
+	@OneToMany(mappedBy = "comment")
+	private Collection<Reaction> reactions;
+	
 	@ManyToOne
-	@JoinColumn(name="user_id")
+	@JoinColumn(name="user_username")
 	private User user;
 	
 	@ManyToOne
 	@JoinColumn(name="post_id")
 	private Post post;
 	
-	@Column(name = "comment_content", nullable = true, length = 1024)
+	@Column(name = "comment_content", nullable = true)
     private String content;
 	
-	@Column(name = "image_link", nullable = true, length = 1024)
+	@Column(name = "image_link", nullable = true)
     private String imageLink;
 	
 	@Column(name = "date_updated", nullable = false)
     private Date dateUpdated;
 	
+	@Column(name = "time_updated", nullable = false)
+    private Time timeUpdated;
+	
 	@Column(name = "status", nullable = false)
     private boolean status;
+
+	public Collection<Reaction> getReactions() {
+		return reactions;
+	}
+
+	public void setReactions(Collection<Reaction> reactions) {
+		this.reactions = reactions;
+	}
+
+	public Time getTimeUpdated() {
+		return timeUpdated;
+	}
+
+	public void setTimeUpdated(Time timeUpdated) {
+		this.timeUpdated = timeUpdated;
+	}
 
 	public int getId() {
 		return id;

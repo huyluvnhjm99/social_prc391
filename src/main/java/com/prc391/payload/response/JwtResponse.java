@@ -4,18 +4,16 @@ package com.prc391.payload.response;
 public class JwtResponse {
 	private String token;
 	private String type = "Bearer";
-	private int id;
 	private String username;
 	private String avatar_link;
 	private String fullname;
 	private boolean status;
 	private String role;
 	
-	public JwtResponse(String token, int id, String username, String avatar_link, String fullname,
+	public JwtResponse(String token, String username, String avatar_link, String fullname,
 			boolean status, String role) {
 		super();
 		this.token = token;
-		this.id = id;
 		this.username = username;
 		this.avatar_link = avatar_link;
 		this.fullname = fullname;
@@ -33,12 +31,6 @@ public class JwtResponse {
 	}
 	public void setType(String type) {
 		this.type = type;
-	}
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
 	}
 	public String getUsername() {
 		return username;
