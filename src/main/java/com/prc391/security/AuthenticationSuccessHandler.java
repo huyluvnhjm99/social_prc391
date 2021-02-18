@@ -25,13 +25,13 @@ public class AuthenticationSuccessHandler implements org.springframework.securit
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 			if(userDetails.getUser().getRole().equals("user")) {
 				try {
-					redirectStrategy.sendRedirect(arg0, arg1, "/homepage");
+					redirectStrategy.sendRedirect(arg0, arg1, "/u/homepage");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else if(userDetails.getUser().getRole().equals("admin")) {
 				try {
-					redirectStrategy.sendRedirect(arg0, arg1, "/admin");
+					redirectStrategy.sendRedirect(arg0, arg1, "/d/admin");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

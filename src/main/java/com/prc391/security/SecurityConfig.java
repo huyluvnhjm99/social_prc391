@@ -1,5 +1,7 @@
 package com.prc391.security;
 
+import java.util.Arrays;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,10 +20,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import com.prc391.service.UserServiceImpl;
 
 @Configuration
+@PropertySource("classpath:common.properties")
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -51,6 +58,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 	
+	@Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("https://api.imgur.com/3/image"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+	
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -65,13 +82,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable().authorizeRequests();
 			
 		// Các trang không yêu cầu login
-		http.authorizeRequests().antMatchers("/", "/login", "/error", "/static/**", "/register").permitAll();
+		http.authorizeRequests().antMatchers("/", "/a/**", "/error", "/static/**", "/a").permitAll();
 		
 
 		// Trang /userInfo yêu cầu phải login với vai trò ROLE_USER hoặc ROLE_ADMIN.
 		// Nếu chưa login, nó sẽ redirect tới trang /login.
-		http.authorizeRequests().antMatchers("/profile", "/homepage").hasAnyAuthority("user");
-		http.authorizeRequests().antMatchers("/admin").hasAnyAuthority("admin");
+		http.authorizeRequests().antMatchers("/u", "/u/**").hasAnyAuthority("user");
+		http.authorizeRequests().antMatchers("/d", "/d/**").hasAnyAuthority("admin");
 
 		http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/users").hasAnyAuthority("admin");
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/v1/login").permitAll();
@@ -93,7 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.usernameParameter("username")//
 				.passwordParameter("password")
 				// Cấu hình cho Logout Page.
-				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login");
+				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/a/login");
 
 		// Cấu hình Remember Me.
 		http.authorizeRequests().and() //
@@ -106,6 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().antMatchers("/resources/**");
+		web.ignoring().antMatchers("https://api.imgur.com/3/image");
 	}
 
 	@Bean

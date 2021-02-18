@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -33,8 +34,8 @@ public class User implements Serializable {
 	// Quan hệ 1-n với đối tượng ở dưới (Post) (1 user có nhiều post)
     // MappedBy trỏ tới tên biến Address ở trong Person.
 	//@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	@OneToMany
-	private List<Post> posts = new ArrayList<Post>();
+//	@OneToMany
+//	private List<Post> posts = new ArrayList<Post>();
 
 	@Id
 	@NotBlank
@@ -46,18 +47,19 @@ public class User implements Serializable {
 	@Size(min = 6, max = 255)
     @Column(name = "password", nullable = false, length = 255)
     private String password;
+	
+	@Transient
+	private String matchingPassword;
 
-	@NotBlank
 	@Size(max = 1024)
-    @Column(name = "avatar_link", nullable = true)
+    @Column(name = "avatar_link", nullable = true, length = 1024)
     private String avatarLink;
     
 	@NotBlank
 	@Size(min = 6, max = 64)
-    @Column(name = "fullname", nullable = false)
+    @Column(name = "fullname", nullable = false, length = 64)
     private String fullname;
     
-	@NotBlank
     @Column(name = "birthday")
     private Date birthdate;
     
@@ -75,6 +77,14 @@ public class User implements Serializable {
     @Size(max = 16)
     @Column(name = "role", length = 16)
     private String role;
+
+	public String getMatchingPassword() {
+		return matchingPassword;
+	}
+
+	public void setMatchingPassword(String matchingPassword) {
+		this.matchingPassword = matchingPassword;
+	}
 
 	public String getUsername() {
 		return username;
@@ -156,24 +166,9 @@ public class User implements Serializable {
 		super();
 	}
 
-	public User(String username, String password, String avatarLink, String fullname, Date birthdate,
-			String gmail, String facebook, boolean status, String role) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.avatarLink = avatarLink;
-		this.fullname = fullname;
-		this.birthdate = birthdate;
-		this.gmail = gmail;
-		this.facebook = facebook;
-		this.status = status;
-		this.role = role;
-	}
-
-	public User(List<Post> posts, String username, String password, String avatarLink, String fullname,
+	public User(String username, String password, String avatarLink, String fullname,
 			Date birthdate, String gmail, String facebook, boolean status, String role) {
 		super();
-		this.posts = posts;
 		this.username = username;
 		this.password = password;
 		this.avatarLink = avatarLink;
@@ -197,5 +192,36 @@ public class User implements Serializable {
 		this.status = status;
 		this.role = role;
 	}
+
+	public User(@NotBlank @Size(min = 6, max = 32) String username, @NotBlank @Size(min = 6, max = 255) String password,
+			String matchingPassword, @Size(max = 1024) String avatarLink,
+			@NotBlank @Size(min = 6, max = 64) String fullname, Date birthdate, @Size(max = 128) String gmail,
+			@Size(max = 128) String facebook, boolean status, @Size(max = 16) String role) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.matchingPassword = matchingPassword;
+		this.avatarLink = avatarLink;
+		this.fullname = fullname;
+		this.birthdate = birthdate;
+		this.gmail = gmail;
+		this.facebook = facebook;
+		this.status = status;
+		this.role = role;
+	}
+
+	public User(@NotBlank @Size(min = 6, max = 32) String username, @NotBlank @Size(min = 6, max = 255) String password,
+			String matchingPassword, @Size(max = 1024) String avatarLink,
+			@NotBlank @Size(min = 6, max = 64) String fullname, Date birthdate) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.matchingPassword = matchingPassword;
+		this.avatarLink = avatarLink;
+		this.fullname = fullname;
+		this.birthdate = birthdate;
+	}
+	
+	
 }
 
