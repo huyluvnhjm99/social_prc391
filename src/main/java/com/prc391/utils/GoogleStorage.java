@@ -1,11 +1,10 @@
 package com.prc391.utils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -21,7 +20,8 @@ public class GoogleStorage {
 	}
 
 	private static Bucket getBucket(String bucketName) throws IOException {
-		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("../prc391.json"))
+		InputStream is = new URL("https://storage.googleapis.com/hybrid-dominion-301502.appspot.com/prc391.json").openStream();
+		GoogleCredentials credentials = GoogleCredentials.fromStream(is)
 				.createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
 		Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
 		Bucket bucket = storage.get(bucketName);
