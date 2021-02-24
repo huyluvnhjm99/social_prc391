@@ -15,8 +15,9 @@ public class GoogleStorage {
 
 	public static String uploadFile(InputStream is, String filename, String fileType) throws IOException {
 		Bucket bucket = getBucket("hybrid-dominion-301502.appspot.com");
-		Blob blob = bucket.create(filename, is, fileType);
-		return blob.getMediaLink();
+		bucket.create(filename, is, fileType);	
+		String uri = "https://storage.googleapis.com/hybrid-dominion-301502.appspot.com/" + filename;
+		return uri;
 	}
 
 	private static Bucket getBucket(String bucketName) throws IOException {

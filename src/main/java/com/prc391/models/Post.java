@@ -140,15 +140,15 @@ public class Post implements Serializable {
 		return serialVersionUID;
 	}
 
-	public Post(int id, User user, String content, String imageLink, String videoLink, Date dateUpdated,
+	public Post(int id, User user, String content, String imageLink, String videoLink, Date dateUpdated, Time timeUpdated,
 			boolean status) {
 		super();
-		this.id = id;
 		this.user = user;
 		this.content = content;
 		this.imageLink = imageLink;
 		this.videoLink = videoLink;
 		this.dateUpdated = dateUpdated;
+		this.timeUpdated = timeUpdated;
 		this.status = status;
 	}
 
@@ -156,12 +156,12 @@ public class Post implements Serializable {
 		super();
 	}
 
-	public Post(int id, String content, String imageLink, String videoLink, Date dateUpdated, boolean status) {
+	public Post(String content, String imageLink, String videoLink, Date dateUpdated, Time timeUpdated, boolean status) {
 		super();
-		this.id = id;
 		this.content = content;
 		this.imageLink = imageLink;
 		this.videoLink = videoLink;
+		this.timeUpdated = timeUpdated;
 		this.dateUpdated = dateUpdated;
 		this.status = status;
 	}

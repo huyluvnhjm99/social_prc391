@@ -41,6 +41,9 @@ public class Comment implements Serializable {
 	@Column(name = "image_link", nullable = true)
     private String imageLink;
 	
+	@Column(name = "video_link", nullable = true)
+    private String videoLink;
+	
 	@Column(name = "date_updated", nullable = false)
     private Date dateUpdated;
 	
@@ -125,6 +128,82 @@ public class Comment implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
-	
+
+	public String getVideoLink() {
+		return videoLink;
+	}
+
+	public void setVideoLink(String videoLink) {
+		this.videoLink = videoLink;
+	}
+
+	public Comment() {
+		super();
+	}
+
+	public Comment(Collection<Reaction> reactions, User user, Post post, String content, String imageLink,
+			String videoLink, Date dateUpdated, Time timeUpdated, boolean status) {
+		super();
+		this.reactions = reactions;
+		this.user = user;
+		this.post = post;
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.timeUpdated = timeUpdated;
+		this.status = status;
+	}
+
+	public Comment(int id, Collection<Reaction> reactions, User user, Post post, String content, String imageLink,
+			String videoLink, Date dateUpdated, Time timeUpdated, boolean status) {
+		super();
+		this.id = id;
+		this.reactions = reactions;
+		this.user = user;
+		this.post = post;
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.timeUpdated = timeUpdated;
+		this.status = status;
+	}
+
+	public Comment(int id, Collection<Reaction> reactions, Post post, String content, String imageLink,
+			String videoLink, Date dateUpdated, Time timeUpdated, boolean status) {
+		super();
+		this.id = id;
+		this.reactions = reactions;
+		this.post = post;
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.timeUpdated = timeUpdated;
+		this.status = status;
+	}
+
+	public Comment(int id, String content, String imageLink, String videoLink, Date dateUpdated, Time timeUpdated,
+			boolean status) {
+		super();
+		this.id = id;
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.timeUpdated = timeUpdated;
+		this.status = status;
+	}
+
+	public Comment(String content, String imageLink, String videoLink, Date dateUpdated, Time timeUpdated,
+			boolean status) {
+		super();
+		this.content = content;
+		this.imageLink = imageLink;
+		this.videoLink = videoLink;
+		this.dateUpdated = dateUpdated;
+		this.timeUpdated = timeUpdated;
+		this.status = status;
+	}
 }

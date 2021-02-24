@@ -15,6 +15,18 @@ public class PostServiceImpl {
 	private PostRepository postRepo;
 	
 	public List<Post> loadAllPost() {
-		return postRepo.findAll();
+		return postRepo.findAll(true);
+	}
+	
+	public List<Post> loadByUsername(String username) {
+		return postRepo.findByUsername(true, username);
+	}
+	
+	public Post findOne(int id) {
+		return postRepo.findById(id).get();
+	}
+	
+	public void savePost(Post post) {
+		postRepo.save(post);
 	}
 }

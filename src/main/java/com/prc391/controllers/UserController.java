@@ -2,15 +2,18 @@ package com.prc391.controllers;
 
 import java.security.Principal;
 import java.sql.Date;
+import java.sql.Time;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +21,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.prc391.models.Comment;
 import com.prc391.models.Post;
+import com.prc391.models.User;
 import com.prc391.models.UserDetails;
+import com.prc391.repositories.CommentRepository;
+import com.prc391.repositories.PostRepository;
+import com.prc391.repositories.UserRepository;
 import com.prc391.service.PostServiceImpl;
 import com.prc391.utils.GoogleStorage;
 
+@RequestMapping(value = "/u")
 @Controller
 public class UserController {
+	
+	@Autowired
+	private UserRepository userRepo;
+	
+	@Autowired
+	private CommentRepository commentRepo;
 	
 	@Autowired
 	private PostServiceImpl postService;
@@ -32,8 +47,10 @@ public class UserController {
 	@Autowired
 	private Environment env;
 	
-	@RequestMapping("/u/homepage") 
-    public String homepage(Model model, Principal principal, 
+	@RequestMapping("/homepage") 
+    public String homepage(Model model, Principal principal,
+    		@Nullable @RequestParam(required = false, name = "message") String message,
+    		@Nullable @RequestParam(required = false, name = "imessage") String imessage,
     		@Nullable @RequestParam("invImg") String invImg, 
     		@Nullable @RequestParam("invVid") String invVid){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
@@ -46,19 +63,69 @@ public class UserController {
 		}
 		model.addAttribute("listPosts", listPost);
 		model.addAttribute("userDTO", userdetails.getUser());
-		model.addAttribute("invVid", invVid);
-		model.addAttribute("invImg", invImg);
+		if(invVid != null)
+			model.addAttribute("invVid", invVid);
+		if(invImg != null)
+			model.addAttribute("invImg", invImg);
+		if(message != null)
+			model.addAttribute("message", message);
+		if(imessage != null)
+			model.addAttribute("imessage", imessage);
         return "homepage"; 
     } 
 	
-	@RequestMapping("/u/profile") 
+	@RequestMapping("/profile") 
     public String profile(Model model, Principal principal){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
-        model.addAttribute("userDetail", userdetails);
+		
+		List<Post> listPost = postService.loadByUsername(userdetails.getUsername());
+		for (int i = 0; i < listPost.size(); i++) {
+			if(listPost.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
+				listPost.get(i).setDateUpdated(null);
+			}
+		}
+		model.addAttribute("listPosts", listPost);
+		model.addAttribute("userDTO", userdetails.getUser());       
         return "profile"; 
-    } 
+    }
 	
-	@PostMapping("/u/post") 
+	@PostMapping("/comment")
+	public String comment(Model model, Principal principal, 
+			@Nullable @RequestParam("commentContent") String content,
+			@RequestParam("postID") int postID,
+			@Nullable @RequestParam("commentMedia") MultipartFile media) {
+		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+		try {
+			if(content == null) {
+				content = "";
+			}
+			String videoLink = null, imageLink = null;
+			if(media != null && !media.isEmpty()) {
+				if(media.getSize() > 5555000) {
+					return "error?message=" + env.getProperty("size.comment");  
+				} else {
+					if(media.getContentType().contains("video")) {
+						videoLink = GoogleStorage.uploadFile(media.getInputStream(), userdetails.getUsername() + "" + Long.toString(System.currentTimeMillis()), 
+								media.getContentType());
+					} else if (media.getContentType().contains("image")) {
+						imageLink = GoogleStorage.uploadFile(media.getInputStream(), userdetails.getUsername() + "" + Long.toString(System.currentTimeMillis()), 
+								media.getContentType());
+					}					
+				}		
+			}
+			Comment commentDTO = new Comment(content, imageLink, videoLink, 
+					new Date(System.currentTimeMillis()), new Time(System.currentTimeMillis()), true);
+			commentDTO.setUser(userRepo.findByUsername(userdetails.getUsername()));
+			commentDTO.setPost(postService.findOne(postID));
+			commentRepo.save(commentDTO);
+			return "redirect:/u/homepage";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "error?message=" + env.getProperty("failed.comment");	
+		}
+	}
+	
+	@PostMapping("/post") 
     public String upload(Model model, Principal principal, 
     		@Nullable @RequestParam("txtContent") String content,
     		@Nullable @RequestParam("imageLink") MultipartFile image, 
@@ -68,7 +135,7 @@ public class UserController {
 				content = "";
 			
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
-			String imageLink, videoLink;
+			String imageLink = null, videoLink = null;
 			
 			if(image != null && !image.isEmpty()) {
 				if(image.getContentType().contains("image")) {
@@ -95,10 +162,50 @@ public class UserController {
 					return "redirect:/u/homepage?invVid=" + env.getProperty("invalid.post.video.type");  
 				}
 			}
-			//String imageLink = GoogleStorage.uploadImage(file.getInputStream(), file.getName());
+			Post post = new Post(content, imageLink, videoLink, new Date(System.currentTimeMillis()), new Time(System.currentTimeMillis()), true);
+			post.setUser(userRepo.findByUsername(userdetails.getUsername()));
+			postService.savePost(post);
+			
+			return "redirect:/u/homepage?message=" + env.getProperty("success.post"); 
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-        return "profile"; 
-    } 
+			return "redirect:/u/homepage?imessage=" + env.getProperty("failed.post");
+		} 
+    }
+	
+	@PostMapping("/profile/avatar")
+	public String avatar(Model model, Principal principal, 
+    		@RequestParam("imageLink") MultipartFile image,
+    		HttpServletRequest request) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			String imageLink = null;
+			if(image != null && !image.isEmpty()) {
+				if(image.getContentType().contains("image")) {
+					if(image.getSize() > 4195000) {
+						return "error?message=" + env.getProperty("invalid.post.image.size");  
+					} else {
+						imageLink = GoogleStorage.uploadFile(image.getInputStream(), userdetails.getUsername() + "" + Long.toString(System.currentTimeMillis()), 
+								image.getContentType());
+						userRepo.updateAvatar(userdetails.getUsername(), imageLink);
+						
+						User userDTO = userdetails.getUser();
+						userDTO.setAvatarLink(imageLink);
+						userdetails.setUser(userDTO);
+						UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userdetails, null, userdetails.getAuthorities());
+						authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+						return "redirect:/u/profile";
+					}
+				} else {
+					return "error?message=" + env.getProperty("invalid.post.image.type"); 
+				}
+			} else {
+				return "error?message=" + "Upload avatar failed!";
+			}
+		} catch (Exception e) {
+			return "error?message=" + "Upload avatar failed!";
+		}	
+	}
 }

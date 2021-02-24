@@ -30,6 +30,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Query(value = "UPDATE [user] set status = ?2 WHERE username = ?1", nativeQuery = true)
 	void updateStatus(String username, boolean status);
 	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE [user] set avatar_link = ?2 WHERE username = ?1", nativeQuery = true)
+	void updateAvatar(String username, String imageLink);
+	
 	@Query(value = "SELECT * FROM [user]", nativeQuery = true)
 	List<User> findAll();
 }

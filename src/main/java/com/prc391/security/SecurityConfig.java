@@ -67,14 +67,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-	
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-
-		// Sét đặt dịch vụ để tìm kiếm User trong Database.
-		// Và sét đặt PasswordEncoder.
-		auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
-	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -118,6 +110,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.tokenValiditySeconds(1 * 24 * 60 * 60); // 24h
 
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+	}
+	
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+
+		// Sét đặt dịch vụ để tìm kiếm User trong Database.
+		// Và sét đặt PasswordEncoder.
+		auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
 	}
 	
 	@Override

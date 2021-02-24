@@ -22,6 +22,10 @@
 		color: white;
 		transition: 0.5s;
 	}
+	
+	.fa-camera:hover {
+		border: 2px solid #4e73df;
+	}
 </style>
 
 <!-- Custom fonts for this template-->
@@ -47,7 +51,7 @@
 			id="accordionSidebar">
 
 			<!-- Sidebar - Brand -->
-			<a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html"/>
+			<a class="sidebar-brand d-flex align-items-center justify-content-center" href="/u/homepage"/>
 				<div class="sidebar-brand-icon rotate-n-15">
 					<i class="fas fa-laugh-wink"></i>
 				</div>
@@ -344,7 +348,7 @@
 							<div
 								class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
 								aria-labelledby="userDropdown">
-								<a class="dropdown-item" href="#"> <i
+								<a class="dropdown-item" href="/u/profile"> <i
 									class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
 								</a> <a class="dropdown-item" href="#"> <i
 									class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -370,8 +374,9 @@
 				<div class="container-fluid">
 
 					<!-- Page Heading -->
-					<div
-						class="d-sm-flex align-items-center justify-content-between mb-4 card shadow"
+					<th:block th:if="${imessage}"><div onload="showMessage()" id="PostMessage" th:text="${imessage}" style="color: red; text-align: center;"></div></th:block>
+					<th:block th:if="${message}"><div onload="showMessage()" id="PostMessage" th:text="${message}" style="color: green; text-align: center;"></div></th:block>
+					<div class="d-sm-flex align-items-center justify-content-between mb-4 card shadow"
 						style="width: 50%; margin-left: 25%;">
 						<form th:action="@{/u/post}" method="POST" enctype="multipart/form-data">
 							<textarea rows="4" cols="50"
@@ -385,7 +390,7 @@
 										th:text="${invImg}"></span>
 							<div id="divImg" style="display: none;">
 								Upload Image:
-	                        	<input type="file" accept="image/png, image/jpeg, image/jpg, image/gif" name="imageLink"/>
+	                        	<input onchange="Filevalidation1()" type="file" id="inpImg" accept="image/png, image/jpeg, image/jpg, image/gif" name="imageLink"/>
 	                        	<span id="sizeImg"></span>	
 								<br/>
 								<br /> 
@@ -394,7 +399,7 @@
 										th:text="${invVid}"></span>
 							<div id="divVid" style="display: none;">
 								Upload Video:
-	                        	<input type="file" accept="video/mp4" name="videoLink"/>
+	                        	<input onchange="Filevalidation2()" type="file" id="inpVid" accept="video/mp4" name="videoLink"/>
 	                        	<span id="sizeVid"></span>
 	                        	<br/>		
 	                        	<br/>	
@@ -417,7 +422,7 @@
 												<div class="d-flex flex-column ml-2">
 													<span class="font-weight-bold"
 														th:text=${post.user.fullname}></span> <small
-														class="text-primary">????dưới tên</small>
+														class="text-primary">?????</small>
 												</div>
 											</div>
 											<div class="d-flex flex-row mt-1 ellipsis">
@@ -429,11 +434,17 @@
 												</small> <i class="fa fa-ellipsis-h"></i>
 											</div>
 										</div>
-										<div th:id="${post.imageLink != null}">
-											<img th:src="${post.imageLink}" class="img-fluid">
-										</div>
+										
 										<div class="p-2">
 											<span class="text-justify" th:text="${post.content}"></span><br />
+											<div th:if="${post.imageLink != null}">
+											<img th:src="${post.imageLink}" class="img-fluid">
+										</div>
+										<div th:if="${post.videoLink != null}">
+											<video style="width: 60%; margin-left: 20%;" width="480" height="320" controls>
+												<source th:src="${post.videoLink}" class="img-fluid" type="video/mp4">
+											</video>
+										</div>
 											<hr>
 											<div
 												class="d-flex justify-content-between align-items-center">
@@ -447,7 +458,7 @@
 											</div>
 											<hr>
 											<div class="comments">
-												<th:block th:each="comment : ${post.comments}">
+												<th:block th:each="comment : ${post.comments}" th:if="${comment.status}">
 													<div class="d-flex flex-row mb-2">
 														<img th:src="${comment.user.avatarLink}" width="40"
 															class="rounded-image">
@@ -455,6 +466,11 @@
 															<span class="name" th:text="${comment.user.fullname}"></span> 
 															<small class="comment-text" th:text="${comment.content}"></small>
 															<th:block th:if="${comment.imageLink != null}"><img th:src="${comment.imageLink}" width="200px" style="border-radius: 18px;" /></th:block>
+															<th:block th:if="${comment.videoLink != null}">
+																<video style="" width="320" height="240" controls>
+																	<source th:src="${comment.videoLink}" class="img-fluid" type="video/mp4">
+																</video>
+															</th:block>
 															<div class="d-flex flex-row align-items-center status">
 																<small>Like</small> <small>Reply</small> <small>Translate</small>
 																<small>
@@ -464,24 +480,21 @@
 														</div>
 													</div>
 												</th:block>
-												<div class="d-flex flex-row mb-2">
-													<img src="https://i.imgur.com/1YrCKa1.jpg" width="40"
-														class="rounded-image">
-													<div class="d-flex flex-column ml-2">
-														<span class="name">Elizabeth goodmen</span> <small
-															class="comment-text">Thanks for sharing!</small>	
-														<div class="d-flex flex-row align-items-center status">
-															<small>Like</small> <small>Reply</small> <small>Translate</small>
-															<small>8 mins</small>
-														</div>
-													</div>
-												</div>
+												<form th:action="@{/u/comment}" method="POST" enctype="multipart/form-data">
 												<div class="comment-input">
-													<input type="text" class="form-control">
-													<div class="fonts">
-														<i class="fa fa-camera"></i>
-													</div>
+														<input type="text" name="commentContent" class="form-control">
+														<div class="fonts">
+															<span class="fa fa-camera" onclick="display('divCommentMedia')"></span>
+														</div>
+													
 												</div>
+												<div style="display: none; margin-left: 3%; margin-top: 1%;" id="divCommentMedia">
+													<input onchange="Filevalidation3()" type="file" id="inpMedia"
+															accept="image/png, image/jpeg, image/jpg, image/gif, video/mp4" name="commentMedia"/>
+													<span id="sizeMedia"></span>
+													<input type="hidden" th:value="${post.id}" name="postID"/>	
+												</div>
+												</form>	
 											</div>
 										</div>
 									</div>
@@ -489,9 +502,6 @@
 							</div>
 						</div>
 					</th:block>
-
-
-
 
 				</div>
 				<!-- End of Main Content -->
@@ -568,8 +578,8 @@
 			}
 		</script>
 		<script> 
-		    Filevalidation = () => { 
-		        const fi = document.getElementById('divImg'); 
+		    Filevalidation1 = () => { 
+		        const fi = document.getElementById('inpImg'); 
 		        // Check if any file is selected. 
 		        if (fi.files.length > 0) { 
 		            for (const i = 0; i <= fi.files.length - 1; i++) { 
@@ -580,15 +590,17 @@
 		                if (file >= 4096) { 
 		                    alert( 
 		                      "File too Big, please select a file less than 4mb");
-		                    document.getElementById('divImg').innerHTML = "";
+		                    document.getElementById('inpImg').value = "";
+		                    document.getElementById('sizeImg').innerHTML = "";
 		                    return false;
 		                } else if (file < 1) { 
 		                    alert( 
 		                      "File too small!"); 
-		                    document.getElementById('divImg').innerHTML = "";
+		                    document.getElementById('inpImg').value = "";
+		                    document.getElementById('sizeImg').innerHTML = "";
 		                    return false;
 		                } else { 
-		                    document.getElementById('sizeImg').innerHTML = '<b>File size: '
+		                    document.getElementById('sizeImg').innerHTML = '<br/><b>File size: '
 		                    + file + '</b> KB'; 
 		                } 
 		            } 
@@ -596,8 +608,8 @@
 		    } 
 </script>
 <script> 
-		    Filevalidation = () => { 
-		        const fi = document.getElementById('divVid'); 
+		    Filevalidation2 = () => { 
+		        const fi = document.getElementById('inpVid'); 
 		        // Check if any file is selected. 
 		        if (fi.files.length > 0) { 
 		            for (const i = 0; i <= fi.files.length - 1; i++) { 
@@ -608,21 +620,64 @@
 		                if (file >= 10240) { 
 		                    alert( 
 		                      "File too Big, please select a file less than 10mb");
-		                    document.getElementById('divVid').innerHTML = "";
+		                    document.getElementById('inpVid').value = "";
+		                    document.getElementById('sizeVid').innerHTML = "";
 		                    return false;
 		                } else if (file < 1) { 
 		                    alert( 
 		                      "File too small!"); 
-		                    document.getElementById('divVid').innerHTML = "";
+		                    document.getElementById('inpVid').innerHTML = "";
+		                    document.getElementById('sizeVid').innerHTML = "";
 		                    return false;
 		                } else { 
-		                    document.getElementById('sizeVid').innerHTML = '<b>File size: '
+		                    document.getElementById('sizeVid').innerHTML = '<br/>	<b>File size: '
 		                    + file + '</b> KB'; 
 		                } 
 		            } 
 		        } 
 		    } 
-</script>
+	</script>
+	<script> 
+		    Filevalidation3 = () => { 
+		        const fi = document.getElementById('inpMedia'); 
+		        // Check if any file is selected. 
+		        if (fi.files.length > 0) { 
+		            for (const i = 0; i <= fi.files.length - 1; i++) { 
+		  
+		                const fsize = fi.files.item(i).size; 
+		                const file = Math.round((fsize / 1024)); 
+		                // The size of the file. 
+		                if (file >= 5121) { 
+		                    alert( 
+		                      "File too Big, please select a file less than 5mb");
+		                    document.getElementById('inpMedia').value = "";
+		                    document.getElementById('sizeMedia').innerHTML = "";
+		                    return false;
+		                } else if (file < 1) { 
+		                    alert( 
+		                      "File too small!"); 
+		                    document.getElementById('inpMedia').innerHTML = "";
+		                    document.getElementById('sizeMedia').innerHTML = "";
+		                    return false;
+		                } else { 
+		                    document.getElementById('sizeMedia').innerHTML = '<br/>	<b>File size: '
+		                    + file + '</b> KB'; 
+		                } 
+		            } 
+		        } 
+		    } 
+	</script>
+	<script type="text/javascript">
+		function showMessage() {
+			var x = document.getElementById('PostMessage').innerHTML;
+			if(x !== null) {
+			  	alert(x);
+			}
+		}
+	</script>
+	<script>
+	 $(window).on('load', showMessage());
+	</script>
 </body>
 
 </html>
