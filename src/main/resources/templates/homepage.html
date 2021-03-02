@@ -11,21 +11,7 @@
 
 <title>Dashboard</title>
 <style type="text/css">
-	textarea:focus {
-		outline: none !important;
-    	border:1px solid blue;
-    	box-shadow: 0 0 10px #719ECE;
-	}
 	
-	.hover:hover {
-		background-color: #4e73df;
-		color: white;
-		transition: 0.5s;
-	}
-	
-	.fa-camera:hover {
-		border: 2px solid #4e73df;
-	}
 </style>
 
 <!-- Custom fonts for this template-->
@@ -425,13 +411,21 @@
 														class="text-primary">?????</small>
 												</div>
 											</div>
-											<div class="d-flex flex-row mt-1 ellipsis">
+											<div class="d-flex flex-row mt-1 ellipsis post-dropdown">
 												<small class="mr-2"> <th:block
 														th:if="${post.dateUpdated != null}"
 														th:text="${post.dateUpdated}" /> <th:block
 														th:if="${post.dateUpdated == null}"
 														th:text="${post.timeUpdated}" />
-												</small> <i class="fa fa-ellipsis-h"></i>
+												</small> 
+												<i class="fa fa-ellipsis-h dropbtn" th:attr="onclick=|showPostFunction('post-${post.id}')|"></i>
+												<div th:id="${'post-'+post.id}" class="dropdown-menu-right shadow animated--grow-in post-dropdown-content dropdown-menu">
+												    <th:block th:if="${post.user.username eq userDTO.username}">
+												    	<a th:href="${'../u/post/delete/'+post.id}" onclick="return confirm_delete()" class="dropdown-item" style="color: red;">Delete</a>
+												    </th:block>    
+												    <a th:href="${'../u/profile?username='+post.user.username}" class="dropdown-item">View Profile</a>
+												    <a href="#contact" class="dropdown-item">Report</a>
+												 </div>
 											</div>
 										</div>
 										
@@ -457,7 +451,8 @@
 												</div>
 											</div>
 											<hr>
-											<div class="comments">
+											<input type="button" class="btn btn-primary shadow" style="margin-left: 40%;" th:id="${'button-comment-' +post.id}" value="View comments" th:attr="onclick=|display('div-comment-${post.id}'); display('button-comment-${post.id}')|"/>
+											<div class="comments" style="display: none;" th:id="${'div-comment-' +post.id}">
 												<th:block th:each="comment : ${post.comments}" th:if="${comment.status}">
 													<div class="d-flex flex-row mb-2">
 														<img th:src="${comment.user.avatarLink}" width="40"
@@ -472,7 +467,16 @@
 																</video>
 															</th:block>
 															<div class="d-flex flex-row align-items-center status">
-																<small>Like</small> <small>Reply</small> <small>Translate</small>
+																<th:block th:if="${userDTO.username eq comment.user.username}">				
+																		<form th:action="@{/u/comment/delete}" method="POST" enctype="multipart/form-data">
+																		<small>
+																			<input type="hidden" name="txtCommentID" th:value="${comment.id}" />
+																			<input type="hidden" name="txtPostID" th:value="${post.id}" />
+																			<input type="submit" class="btn btn-link" value="Delete" onclick="return confirm_delete()" /> 
+																		</small>
+																		</form>
+																</th:block>
+																
 																<small>
 																	<span th:text="${comment.dateUpdated}"></span>&nbsp;at&nbsp;<span th:text="${comment.timeUpdated}"></span>
 																</small>
@@ -678,6 +682,32 @@
 	<script>
 	 $(window).on('load', showMessage());
 	</script>
+	<script>
+	/* When the user clicks on the button, 
+	toggle between hiding and showing the dropdown content */
+		function showPostFunction(x1) {
+		  document.getElementById(x1).classList.toggle("show");
+		}
+	
+	// Close the dropdown if the user clicks outside of it
+		window.onclick = function(event) {
+		  if (!event.target.matches('.dropbtn')) {
+		    var dropdowns = document.getElementsByClassName("post-dropdown-content");
+		    var i;
+		    for (i = 0; i < dropdowns.length; i++) {
+		      var openDropdown = dropdowns[i];
+		      if (openDropdown.classList.contains('show')) {
+		        openDropdown.classList.remove('show');
+		      }
+		    }
+		  }
+		}
+	</script>
+	<script>
+    	function confirm_delete() {
+        	return confirm('Are you sure to delete?');
+        }
+    </script>
 </body>
 
 </html>

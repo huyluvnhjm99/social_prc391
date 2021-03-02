@@ -16,8 +16,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -74,11 +77,18 @@ public class UserController {
         return "homepage"; 
     } 
 	
-	@RequestMapping("/profile") 
-    public String profile(Model model, Principal principal){
+	@GetMapping(value = {"/profile"}) 
+    public String profile(Model model, Principal principal, @Nullable @RequestParam("username") String username){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
-		
-		List<Post> listPost = postService.loadByUsername(userdetails.getUsername());
+		List<Post> listPost;
+		if(username != null) {
+			listPost = postService.loadByUsername(username);
+			model.addAttribute("user", userRepo.findByUsername(username));
+		} else {
+			listPost = postService.loadByUsername(userdetails.getUsername());
+			model.addAttribute("user", userdetails.getUser());
+		}
+ 
 		for (int i = 0; i < listPost.size(); i++) {
 			if(listPost.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
 				listPost.get(i).setDateUpdated(null);
@@ -88,6 +98,22 @@ public class UserController {
 		model.addAttribute("userDTO", userdetails.getUser());       
         return "profile"; 
     }
+	
+	@PostMapping("/comment/delete")
+	public String deleteComment(Model model, Principal principal, 
+			@RequestParam("txtCommentID") int commentID,
+			@RequestParam("txtPostID") int postID) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(commentRepo.update(commentID, postID, userdetails.getUsername(), false) == 1) {
+				return "redirect:/u/homepage?message=" + env.getProperty("success");
+			} else {
+				return "redirect:/error/" + env.getProperty("invalid");
+			}
+		} catch (Exception e) {
+			return "redirect:/error/" + env.getProperty("invalid");
+		}
+	}
 	
 	@PostMapping("/comment")
 	public String comment(Model model, Principal principal, 
@@ -102,7 +128,7 @@ public class UserController {
 			String videoLink = null, imageLink = null;
 			if(media != null && !media.isEmpty()) {
 				if(media.getSize() > 5555000) {
-					return "error?message=" + env.getProperty("size.comment");  
+					return "redirect:/error/" + env.getProperty("size.comment");  
 				} else {
 					if(media.getContentType().contains("video")) {
 						videoLink = GoogleStorage.uploadFile(media.getInputStream(), userdetails.getUsername() + "" + Long.toString(System.currentTimeMillis()), 
@@ -121,7 +147,7 @@ public class UserController {
 			return "redirect:/u/homepage";
 		} catch (Exception e) {
 			e.printStackTrace();
-			return "error?message=" + env.getProperty("failed.comment");	
+			return "redirect:/error/" + env.getProperty("failed.comment");	
 		}
 	}
 	
@@ -173,6 +199,30 @@ public class UserController {
 		} 
     }
 	
+	@RequestMapping("/post/delete/{id}")
+	public String avatar(Model model, Principal principal, 
+    		@PathVariable int id) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			Post postDTO = postService.findOne(id);
+			if(postDTO != null) {
+				if(postDTO.getUser().getUsername().compareTo(userdetails.getUsername()) == 0) {
+					if(postDTO.isStatus()) {
+						postService.updateStatus(id, false);
+					}
+					return "redirect:/u/homepage?message=SUCCESSED";
+				} else {
+					return "redirect:/u/homepage?imessage=Post not yours!";
+				}
+				
+			} else {
+				return "redirect:/u/homepage?imessage=Post not found!";
+			}
+		} catch (Exception e) {
+			return "redirect:/error/" + "Delete post Failed!";
+		}
+	}
+	
 	@PostMapping("/profile/avatar")
 	public String avatar(Model model, Principal principal, 
     		@RequestParam("imageLink") MultipartFile image,
@@ -199,13 +249,13 @@ public class UserController {
 						return "redirect:/u/profile";
 					}
 				} else {
-					return "error?message=" + env.getProperty("invalid.post.image.type"); 
+					return "redirect:/error/" + env.getProperty("invalid.post.image.type"); 
 				}
 			} else {
-				return "error?message=" + "Upload avatar failed!";
+				return "redirect:/error/" + "Upload avatar failed!";
 			}
 		} catch (Exception e) {
-			return "error?message=" + "Upload avatar failed!";
+			return "redirect:/error/" + "Upload avatar failed!";
 		}	
 	}
 }

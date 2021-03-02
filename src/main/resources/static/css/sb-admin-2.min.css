@@ -91,3 +91,38 @@ hr {
     outline: 0;
     box-shadow: none
 }
+
+textarea:focus {
+		outline: none !important;
+    	border:1px solid blue;
+    	box-shadow: 0 0 10px #719ECE;
+	}
+	
+	.hover:hover {
+		background-color: #4e73df;
+		color: white;
+		transition: 0.5s;
+	}
+	
+	.fa-camera:hover {
+		border: 2px solid #4e73df;
+	}
+	
+	.post-dropdown {
+	  position: relative;
+	  display: inline-block;
+	}
+	
+	.post-dropdown-content {
+	  display: none;
+	  z-index: 1;
+	}
+	
+	.show {display: block;}
+
+.btn-link {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+}
+

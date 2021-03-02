@@ -29,4 +29,8 @@ public class PostServiceImpl {
 	public void savePost(Post post) {
 		postRepo.save(post);
 	}
+	
+	public void updateStatus(int id, boolean status) {
+		postRepo.updateStatus(id, status);
+	}
 }

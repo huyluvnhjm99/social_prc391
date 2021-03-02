@@ -374,30 +374,32 @@
 				<div class="container-fluid">
 					<div class="card shadow divProfile">
 						<div class="div-avatar-profile">
-							<img style="min-width: 150px; width: 50%;" class="" th:src="${userDTO.avatarLink}" /><br/>
+							<img style="min-width: 150px; width: 50%;" class="" th:src="${user.avatarLink}" /><br/>
+							<th:block th:if="${user.username eq userDTO.username}">
 							<form th:action="@{../u/profile/avatar}" method="POST" enctype="multipart/form-data">
 								<input type="button" onclick="display('divImg'); display('btnAvatar')" id="btnAvatar" class="btn shadow" style="border: 1px solid #4e73df; border-radius: 5px;" value="Change avatar"/>
-								<div id="divImg" style="display: none;">
-									<input type="button" class="btn btn-danger" value="close" onclick="display('divImg'); display('btnAvatar')"/><br/>
-		                        	Upload new avatar (Max 4mb): <input onchange="Filevalidation1()" style="width: 200px;"  
-		                        	type="file" id="inpImg" accept="image/png, image/jpeg, image/jpg, image/gif" name="imageLink" required="required"/>	
-									<input type="submit" class="btn btn-primary" value="Upload"/>
-									<span id="sizeImg"></span>
-								</div>
+									<div id="divImg" style="display: none;">
+										<input type="button" class="btn btn-danger" value="close" onclick="display('divImg'); display('btnAvatar')"/><br/>
+			                        	Upload new avatar (Max 4mb): <input onchange="Filevalidation1()" style="width: 200px;"  
+			                        	type="file" id="inpImg" accept="image/png, image/jpeg, image/jpg, image/gif" name="imageLink" required="required"/>	
+										<input type="submit" class="btn btn-primary" value="Upload"/>
+										<span id="sizeImg"></span>
+									</div>
 							</form>	
+							</th:block>
 						</div>
 						<div class="div-information-profile">
-							<div class="div-line-info"><img src="../img/name.svg" width="20" style="margin-right: 20px;" /><span th:text="${userDTO.fullname}"></span><br/></div>
+							<div class="div-line-info"><img src="../img/name.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.fullname}"></span><br/></div>
 							<div class="div-line-info">
-							<img src="../img/birthday.svg" width="20" style="margin-right: 20px;" /><span th:text="${userDTO.birthdate}"></span><br/>
+							<img src="../img/birthday.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.birthdate}"></span><br/>
 							</div>
 							<div class="div-line-info">
-							<img src="../img/gmail.svg" width="20" style="margin-right: 20px;" /> <span th:text="${userDTO.gmail}"></span>
-							<th:block th:if="${userDTO.gmail == null}">Connect with Gmail</th:block><br/>
+							<img src="../img/gmail.svg" width="20" style="margin-right: 20px;" /> <span th:text="${user.gmail}"></span>
+							<th:block th:if="${user.gmail eq null}">Connect with Gmail</th:block><br/>
 							</div>
 							<div class="div-line-info">
-							<img src="../img/fb.svg" width="20" style="margin-right: 20px;" /> <span th:text="${userDTO.facebook}"></span>
-							<th:block th:if="${userDTO.gmail == null}">Connect with Facebook</th:block><br/>
+							<img src="../img/fb.svg" width="20" style="margin-right: 20px;" /> <span th:text="${user.facebook}"></span>
+							<th:block th:if="${user.facebook eq null}">Connect with Facebook</th:block><br/>
 							</div>
 						</div>
 					</div>
