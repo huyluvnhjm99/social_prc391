@@ -300,6 +300,8 @@
 
 				<!-- Begin Page Content -->
 				<div class="container-fluid">
+					<th:block th:if="${imessage}"><div onload="showMessage()" id="PostMessage" th:text="${imessage}" style="color: red; text-align: center;"></div></th:block>
+					<th:block th:if="${message}"><div onload="showMessage()" id="PostMessage" th:text="${message}" style="color: green; text-align: center;"></div></th:block>
 					<div class="card shadow divProfile">
 						<div class="div-avatar-profile">
 							<img style="min-width: 150px; width: 50%;" class="" th:src="${user.avatarLink}" /><br/>
@@ -323,7 +325,10 @@
 							</div>
 							<div class="div-line-info">
 							<img src="../img/gmail.svg" width="20" style="margin-right: 20px;" /> <span th:text="${user.gmail}"></span>
-							<th:block th:if="${user.gmail eq null}">Connect with Gmail</th:block><br/>
+							<th:block th:if="${user.gmail eq null}">
+								<a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/u/google&response_type=code
+    &client_id=107600830171-em5t8i3sfm86tdk7th0i1ekaav0vldgo.apps.googleusercontent.com&approval_prompt=force">Connect with Gmail</a>
+							</th:block><br/>
 							</div>
 							<div class="div-line-info">
 							<img src="../img/fb.svg" width="20" style="margin-right: 20px;" /> <span th:text="${user.facebook}"></span>
@@ -332,8 +337,6 @@
 						</div>
 					</div>
 					<!-- Page Heading -->
-					<th:block th:if="${imessage}"><div onload="showMessage()" id="PostMessage" th:text="${imessage}" style="color: red; text-align: center;"></div></th:block>
-					<th:block th:if="${message}"><div onload="showMessage()" id="PostMessage" th:text="${message}" style="color: green; text-align: center;"></div></th:block>
 					<div class="d-sm-flex align-items-center justify-content-between mb-4 card shadow"
 						style="width: 50%; margin-left: 25%;">
 						<form th:action="@{/u/post}" method="POST" enctype="multipart/form-data">

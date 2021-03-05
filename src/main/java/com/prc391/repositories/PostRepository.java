@@ -25,4 +25,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 	@Modifying
 	@Query(value = "UPDATE [post] set status = ?2 WHERE id = ?1", nativeQuery = true)
 	void updateStatus(int id, boolean status);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE [post] WHERE id = ?1", nativeQuery = true)
+	void delete(int postID);
 }

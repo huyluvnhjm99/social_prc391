@@ -15,5 +15,10 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 	@Transactional
 	@Modifying
 	@Query(value = "UPDATE [comment] set status = ?4 WHERE id = ?1 AND post_id = ?2 AND user_username = ?3", nativeQuery = true)
-	int update(int id, int postID, String username, boolean status);
+	int update(int id, int commentID, String username, boolean status);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "DELETE [comment] WHERE id = ?1", nativeQuery = true)
+	int delete(int commentID);
 }

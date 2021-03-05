@@ -35,6 +35,18 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Query(value = "UPDATE [user] set avatar_link = ?2 WHERE username = ?1", nativeQuery = true)
 	void updateAvatar(String username, String imageLink);
 	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE [user] set gmail = ?2 WHERE username = ?1", nativeQuery = true)
+	void updateGoogle(String username, String google);
+	
 	@Query(value = "SELECT * FROM [user]", nativeQuery = true)
 	List<User> findAll();
+	
+	@Query(value = "SELECT COUNT(username) FROM [user] WHERE gmail = ?1", nativeQuery = true)
+	int findExistedConnectGoogle(String gmail);
+	
+	@Query(value = "SELECT username, avatar_link, fullname, birthday, role, gmail, facebook, password, status FROM [user] "
+			+ "WHERE gmail = ?1 AND status = 'true'", nativeQuery = true)
+	User loginWithGoogle(String gmail);
 }

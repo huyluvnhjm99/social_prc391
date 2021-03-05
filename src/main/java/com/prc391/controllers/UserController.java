@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,12 +28,13 @@ import com.prc391.models.Post;
 import com.prc391.models.Reaction;
 import com.prc391.models.User;
 import com.prc391.models.UserDetails;
+import com.prc391.models.dto.GooglePojo;
 import com.prc391.repositories.CommentRepository;
-import com.prc391.repositories.PostRepository;
 import com.prc391.repositories.ReactionRepository;
 import com.prc391.repositories.UserRepository;
 import com.prc391.service.PostServiceImpl;
 import com.prc391.utils.GoogleStorage;
+import com.prc391.utils.GoogleUtils;
 
 @RequestMapping(value = "/u")
 @Controller
@@ -83,7 +83,9 @@ public class UserController {
     } 
 	
 	@GetMapping(value = {"/profile"}) 
-    public String profile(Model model, Principal principal, @Nullable @RequestParam("username") String username){
+    public String profile(Model model, Principal principal, @Nullable @RequestParam("username") String username,
+    		@Nullable @RequestParam(required = false, name = "message") String message,
+    		@Nullable @RequestParam(required = false, name = "imessage") String imessage){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
 		List<Post> listPost;
 		if(username != null) {
@@ -100,9 +102,44 @@ public class UserController {
 			}
 		}
 		model.addAttribute("listPosts", listPost);
-		model.addAttribute("userDTO", userdetails.getUser());       
+		model.addAttribute("userDTO", userdetails.getUser());
+		if(message != null)
+			model.addAttribute("message", message);
+		if(imessage != null)
+			model.addAttribute("imessage", imessage);
         return "profile"; 
     }
+	
+	@RequestMapping("/google")
+	public String connectGoogle(Model model, Principal principal, 
+			@RequestParam("code") String code, HttpServletRequest request) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(code != null && !code.isEmpty()) {
+				String accessToken = GoogleUtils.getToken(code, env.getProperty("google.redirect.uri.connect"), env);
+				GooglePojo googleAccountDTO = GoogleUtils.getUserInfo(accessToken, env);
+				if(userRepo.findExistedConnectGoogle(googleAccountDTO.getEmail()) > 0) {
+					return "redirect:/u/profile?imessage=" + env.getProperty("google.connect.existed");
+				} else {
+					userRepo.updateGoogle(userdetails.getUsername(), googleAccountDTO.getEmail());
+					
+					User userDTO = userdetails.getUser();
+					userDTO.setGmail(googleAccountDTO.getEmail());
+					userdetails.setUser(userDTO);
+					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userdetails, null, userdetails.getAuthorities());
+					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+					return "redirect:/u/profile?message=" + env.getProperty("success");
+				}			
+			} else {
+				return "redirect:/error/" + env.getProperty("invalid");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/error/" + env.getProperty("invalid");
+		}
+	}
 	
 	@PostMapping("/comment/delete")
 	public String deleteComment(Model model, Principal principal, 
