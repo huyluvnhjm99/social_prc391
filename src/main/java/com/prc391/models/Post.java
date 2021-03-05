@@ -3,12 +3,10 @@ package com.prc391.models;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Time;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,6 +14,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
+
 
 @Entity
 @Table(name = "[post]")
@@ -33,10 +34,11 @@ public class Post implements Serializable {
 	private User user;
 	
 	@OneToMany(mappedBy = "post")
+	@Where(clause = "status='True'")
 	private List<Comment> comments;
 	
 	@OneToMany(mappedBy = "post")
-	private Collection<Reaction> reactions;
+	private List<Reaction> reactions;
 	
     @Column(name = "post_content", nullable = true, length = 1024)
     private String content;
@@ -56,6 +58,15 @@ public class Post implements Serializable {
     @Column(name = "status", nullable = false)
     private boolean status;
 
+    public boolean isLiked(String username) {
+    	for (Reaction reaction : reactions) {
+			if(reaction.getUser().getUsername().equals(username)) {
+				return true;
+			}
+		}
+    	return false;
+    }
+    
 	public List<Comment> getComments() {
 		return comments;
 	}
@@ -64,11 +75,11 @@ public class Post implements Serializable {
 		this.comments = comments;
 	}
 
-	public Collection<Reaction> getReactions() {
+	public List<Reaction> getReactions() {
 		return reactions;
 	}
 
-	public void setReactions(Collection<Reaction> reactions) {
+	public void setReactions(List<Reaction> reactions) {
 		this.reactions = reactions;
 	}
 

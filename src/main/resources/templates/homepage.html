@@ -51,92 +51,20 @@
 
 			<!-- Nav Item - Dashboard -->
 			<li class="nav-item active"><a class="nav-link"
-				href="index.html"> <i class="fas fa-fw fa-tachometer-alt"></i> <span>Dashboard</span></a>
+				href="/u/homepage"> <i class="fas fa-fw fa-tachometer-alt"></i> <span>Dashboard</span></a>
 			</li>
 
 			<!-- Divider -->
 			<hr class="sidebar-divider">
-
-			<!-- Heading -->
-			<div class="sidebar-heading">Interface</div>
-
-			<!-- Nav Item - Pages Collapse Menu -->
-			<li class="nav-item"><a class="nav-link collapsed" href="#"
-				data-toggle="collapse" data-target="#collapseTwo"
-				aria-expanded="true" aria-controls="collapseTwo"> <i
-					class="fas fa-fw fa-cog"></i> <span>Components</span>
-			</a>
-				<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo"
-					data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<h6 class="collapse-header">Custom Components:</h6>
-						<a class="collapse-item" href="buttons.html">Buttons</a> <a
-							class="collapse-item" href="cards.html">Cards</a>
-					</div>
-				</div></li>
-
-			<!-- Nav Item - Utilities Collapse Menu -->
-			<li class="nav-item"><a class="nav-link collapsed" href="#"
-				data-toggle="collapse" data-target="#collapseUtilities"
-				aria-expanded="true" aria-controls="collapseUtilities"> <i
-					class="fas fa-fw fa-wrench"></i> <span>Utilities</span>
-			</a>
-				<div id="collapseUtilities" class="collapse"
-					aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<h6 class="collapse-header">Custom Utilities:</h6>
-						<a class="collapse-item" href="utilities-color.html">Colors</a> <a
-							class="collapse-item" href="utilities-border.html">Borders</a> <a
-							class="collapse-item" href="utilities-animation.html">Animations</a>
-						<a class="collapse-item" href="utilities-other.html">Other</a>
-					</div>
-				</div></li>
-
-			<!-- Divider -->
+			<li class="nav-item active"><a class="nav-link"
+				href="/u/profile"> <i class="fas fa-fw fa-tachometer-alt"></i> <span>Profile</span></a>
+			</li>
 			<hr class="sidebar-divider">
-
-			<!-- Heading -->
-			<div class="sidebar-heading">Addons</div>
-
-			<!-- Nav Item - Pages Collapse Menu -->
-			<li class="nav-item"><a class="nav-link collapsed" href="#"
-				data-toggle="collapse" data-target="#collapsePages"
-				aria-expanded="true" aria-controls="collapsePages"> <i
-					class="fas fa-fw fa-folder"></i> <span>Pages</span>
-			</a>
-				<div id="collapsePages" class="collapse"
-					aria-labelledby="headingPages" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<h6 class="collapse-header">Login Screens:</h6>
-						<a class="collapse-item" href="login.html">Login</a> <a
-							class="collapse-item" href="register.html">Register</a> <a
-							class="collapse-item" href="forgot-password.html">Forgot
-							Password</a>
-						<div class="collapse-divider"></div>
-						<h6 class="collapse-header">Other Pages:</h6>
-						<a class="collapse-item" href="404.html">404 Page</a> <a
-							class="collapse-item" href="blank.html">Blank Page</a>
-					</div>
-				</div></li>
-
-			<!-- Nav Item - Charts -->
-			<li class="nav-item"><a class="nav-link" href="charts.html">
-					<i class="fas fa-fw fa-chart-area"></i> <span>Charts</span>
-			</a></li>
-
-			<!-- Nav Item - Tables -->
-			<li class="nav-item"><a class="nav-link" href="tables.html">
-					<i class="fas fa-fw fa-table"></i> <span>Tables</span>
-			</a></li>
-
-			<!-- Divider -->
-			<hr class="sidebar-divider d-none d-md-block">
-
-			<!-- Sidebar Toggler (Sidebar) -->
-			<div class="text-center d-none d-md-inline">
-				<button class="rounded-circle border-0" id="sidebarToggle"></button>
-			</div>
-
+			<li class="nav-item active"><a class="nav-link"
+				href="/u/profile"> <i class="fas fa-fw fa-tachometer-alt"></i> <span th:text="${userDTO.username}"></span></a>
+			</li>
+			
+			<hr class="sidebar-divider">
 			<!-- Sidebar Message -->
 			<div class="sidebar-card">
 				<img class="sidebar-card-illustration mb-2"
@@ -408,7 +336,7 @@
 												<div class="d-flex flex-column ml-2">
 													<span class="font-weight-bold"
 														th:text=${post.user.fullname}></span> <small
-														class="text-primary">?????</small>
+														class="text-primary">1m ago</small>
 												</div>
 											</div>
 											<div class="d-flex flex-row mt-1 ellipsis post-dropdown">
@@ -443,11 +371,33 @@
 											<div
 												class="d-flex justify-content-between align-items-center">
 												<div class="d-flex flex-row icons d-flex align-items-center">
-													<i class="fa fa-heart"></i> <i class="fa fa-smile-o ml-2"></i>
+													<form th:action="@{../u/post/react}" method="POST">
+														<input type="hidden" name="postID" th:value="${post.id}"/>
+														<th:block th:if="${not post.isLiked(userDTO.username)}">
+															<input type="hidden" name="action" value="like"/>
+															<button type="submit" value="Like" class="btn shadow" style="border: 1px solid blue;">
+																<span style="color:blue;">Like&nbsp;</span>
+																<img src="../img/like.svg" height="20px" style="margin-bottom: 10%;"> 	
+															</button>															
+														</th:block>
+														<th:block th:if="${post.isLiked(userDTO.username)}">
+															<input type="hidden" name="action" value="dislike"/>
+															<button type="submit" value="Dislike" class="btn shadow" style="border: 1px solid red;">
+																<span style="color:red;">Dislike&nbsp;</span>
+																<img src="../img/dislike.svg" height="20px" style="margin-bottom: 5%;"> 	
+															</button>
+														</th:block>
+													</form>
 												</div>
 												<div class="d-flex flex-row muted-color">
-													<span th:text="${post.comments.size()}"></span><span>&nbsp;comments</span><span
-														class="ml-2">Share</span>
+													<span th:text="${post.comments.size()}"></span><span>&nbsp;comments</span>
+													<span>&nbsp;&nbsp;</span>
+													<th:block th:if="${post.reactions.size() gt 1}">
+														<span th:text="${post.reactions.size()}"></span><span>&nbsp;likes</span>
+													</th:block>		
+													<th:block th:if="${post.reactions.size() lt 2}">
+														<span th:text="${post.reactions.size()}"></span><span>&nbsp;like</span>
+													</th:block>
 												</div>
 											</div>
 											<hr>
@@ -488,11 +438,11 @@
 												<div class="comment-input">
 														<input type="text" name="commentContent" class="form-control">
 														<div class="fonts">
-															<span class="fa fa-camera" onclick="display('divCommentMedia')"></span>
+															<span class="fa fa-camera" th:attr="onclick=|display('div-comment-media-${post.id}')|"></span>
 														</div>
 													
 												</div>
-												<div style="display: none; margin-left: 3%; margin-top: 1%;" id="divCommentMedia">
+												<div style="display: none; margin-left: 3%; margin-top: 1%;" th:id="${'div-comment-media-' + post.id}">
 													<input onchange="Filevalidation3()" type="file" id="inpMedia"
 															accept="image/png, image/jpeg, image/jpg, image/gif, video/mp4" name="commentMedia"/>
 													<span id="sizeMedia"></span>

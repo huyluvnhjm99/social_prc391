@@ -26,10 +26,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.prc391.models.Comment;
 import com.prc391.models.Post;
+import com.prc391.models.Reaction;
 import com.prc391.models.User;
 import com.prc391.models.UserDetails;
 import com.prc391.repositories.CommentRepository;
 import com.prc391.repositories.PostRepository;
+import com.prc391.repositories.ReactionRepository;
 import com.prc391.repositories.UserRepository;
 import com.prc391.service.PostServiceImpl;
 import com.prc391.utils.GoogleStorage;
@@ -40,6 +42,9 @@ public class UserController {
 	
 	@Autowired
 	private UserRepository userRepo;
+	
+	@Autowired
+	private ReactionRepository reactionRepo;
 	
 	@Autowired
 	private CommentRepository commentRepo;
@@ -257,5 +262,41 @@ public class UserController {
 		} catch (Exception e) {
 			return "redirect:/error/" + "Upload avatar failed!";
 		}	
+	}
+	
+	@RequestMapping("/post/react")
+	public String avatar(Model model, Principal principal, 
+    		@RequestParam("postID") int postID,
+    		@RequestParam("action") String action) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			Reaction reaction = reactionRepo.getUserReactionByPostID(userdetails.getUsername(), postID);
+			
+			if(action.compareTo("like") == 0) {
+				if(reaction == null) {
+					reaction = new Reaction();
+					reaction.setStatus(true);
+					reaction.setUser(userdetails.getUser());
+					reaction.setDateUpdated(new Date(System.currentTimeMillis()));
+					reaction.setReaction(action);
+					
+					Post post = new Post();
+					post.setId(postID);
+					reaction.setPost(post);
+					
+					reactionRepo.save(reaction);
+				}
+			}
+			
+			if(action.compareTo("dislike") == 0) {
+				if(reaction != null) {
+					reactionRepo.deleteReaction(userdetails.getUsername(), postID);
+				}
+			}
+			return "redirect:/u/homepage";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:/error/" + env.getProperty("invalid");
+		}
 	}
 }
