@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 public class Reaction implements Serializable {
 
@@ -21,10 +23,12 @@ public class Reaction implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 	
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name="user_username")
 	private User user;
 	
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name="post_id")
 	private Post post;

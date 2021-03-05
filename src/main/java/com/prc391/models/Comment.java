@@ -14,6 +14,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 public class Comment implements Serializable {
@@ -25,13 +29,16 @@ public class Comment implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "comment")
 	private Collection<Reaction> reactions;
 	
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name="user_username")
 	private User user;
 	
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name="post_id")
 	private Post post;

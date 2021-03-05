@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prc391.exception.ResourceNotFoundException;
+import com.prc391.models.Post;
 import com.prc391.models.User;
 import com.prc391.models.UserDetails;
 import com.prc391.payload.request.LoginRequest;
 import com.prc391.payload.response.JwtResponse;
+import com.prc391.repositories.PostRepository;
 import com.prc391.repositories.UserRepository;
 import com.prc391.security.JwtTokenProvider;
 
@@ -31,6 +34,9 @@ public class UserRestController {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private PostRepository postRepository;
 
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -82,5 +88,17 @@ public class UserRestController {
 				.orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + id));
 		return ResponseEntity.ok().body(user);
 	}
+	
+	@GetMapping("/posts")
+	public List<Post> getAllPost() {
+		return postRepository.findAll();
+	}
+	
+	@GetMapping("/posts/{username}")
+	public ResponseEntity<List<Post>> getAllUserPost(@PathVariable(value = "username") String username) throws ResourceNotFoundException {
+		return new ResponseEntity<List<Post>>(postRepository.findByUsername(true, username), HttpStatus.OK);
+	}
+	
+	
 
 }

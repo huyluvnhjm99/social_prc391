@@ -2,6 +2,7 @@ package com.prc391.controllers;
 
 import java.security.Principal;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.prc391.models.UserDetails;
 import com.sun.istack.Nullable;
 
 @Controller
@@ -19,7 +21,12 @@ public class HomeController {
     		@Nullable @RequestParam(required = false, name = "message") String message, 
     		@Nullable @RequestParam(required = false, name = "imessage") String imessage){
 		if(principal != null) {
-			return "redirect:/u/homepage";
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(userdetails.getUser().getRole().equals("admin")) {
+				return "redirect:/d/admin";
+			} else if (userdetails.getUser().getRole().equals("user")) {
+				return "redirect:/u/homepage";
+			}	
 		}
 		if(message != null) {
 			model.addAttribute("message", message);

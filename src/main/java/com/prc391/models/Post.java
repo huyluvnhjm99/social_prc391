@@ -17,6 +17,9 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 @Table(name = "[post]")
@@ -29,14 +32,17 @@ public class Post implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 	
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name="user_username")
 	private User user;
 	
+	@JsonManagedReference
 	@OneToMany(mappedBy = "post")
 	@Where(clause = "status='True'")
 	private List<Comment> comments;
 	
+	@JsonManagedReference
 	@OneToMany(mappedBy = "post")
 	private List<Reaction> reactions;
 	
