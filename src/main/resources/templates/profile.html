@@ -319,7 +319,13 @@
 							</th:block>
 						</div>
 						<div class="div-information-profile">
-							<div class="div-line-info"><img src="../img/name.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.fullname}"></span><br/></div>
+							<div class="div-line-info">
+								<img src="../img/name.svg" width="20" style="margin-right: 20px;" />
+								<span th:text="${user.fullname}" id="spanName"></span>
+								<input type="button" class="btn btn-primary" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('inputName');"/> 
+								<input type="text" name="txtFullname" id="inputName" th:value="${user.fullname}" style="display: none;"/>
+								<input type="submit" class="btn btn-primary" id="btnUpdate" style="display: none;" value="Update"/>
+							<br/></div>
 							<div class="div-line-info">
 							<img src="../img/birthday.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.birthdate}"></span><br/>
 							</div>
