@@ -322,9 +322,11 @@
 							<div class="div-line-info">
 								<img src="../img/name.svg" width="20" style="margin-right: 20px;" />
 								<span th:text="${user.fullname}" id="spanName"></span>
-								<input type="button" class="btn btn-primary" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('inputName');"/> 
-								<input type="text" name="txtFullname" id="inputName" th:value="${user.fullname}" style="display: none;"/>
-								<input type="submit" class="btn btn-primary" id="btnUpdate" style="display: none;" value="Update"/>
+								<form th:action="@{/u/profile/updateName}" method="POST">
+									<input type="button" class="btn btn-primary" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('btnUpdate');"/> 
+									<input type="text" name="txtFullname" required min="6" id="inputName" th:value="${user.fullname}" style="display: none;"/>
+									<input type="submit" class="btn btn-primary" id="btnUpdate" style="display: none;" value="Update"/>	
+								</form>					
 							<br/></div>
 							<div class="div-line-info">
 							<img src="../img/birthday.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.birthdate}"></span><br/>
@@ -392,13 +394,21 @@
 														class="text-primary">1m ago</small>
 												</div>
 											</div>
-											<div class="d-flex flex-row mt-1 ellipsis">
+											<div class="d-flex flex-row mt-1 ellipsis post-dropdown">
 												<small class="mr-2"> <th:block
 														th:if="${post.dateUpdated != null}"
 														th:text="${post.dateUpdated}" /> <th:block
 														th:if="${post.dateUpdated == null}"
 														th:text="${post.timeUpdated}" />
-												</small> <i class="fa fa-ellipsis-h"></i>
+												</small> 
+												<i class="fa fa-ellipsis-h dropbtn" th:attr="onclick=|showPostFunction('post-${post.id}')|"></i>
+												<div th:id="${'post-'+post.id}" class="dropdown-menu-right shadow animated--grow-in post-dropdown-content dropdown-menu">
+												    <th:block th:if="${post.user.username eq userDTO.username}">
+												    	<a th:href="${'../u/post/delete/'+post.id}" onclick="return confirm_delete()" class="dropdown-item" style="color: red;">Delete</a>
+												    </th:block>    
+												    <a th:href="${'../u/profile?username='+post.user.username}" class="dropdown-item">View Profile</a>
+												    <a href="#contact" class="dropdown-item">Report</a>
+												 </div>
 											</div>
 										</div>
 										
@@ -413,18 +423,40 @@
 											</video>
 										</div>
 											<hr>
-											<div
-												class="d-flex justify-content-between align-items-center">
+											<div class="d-flex justify-content-between align-items-center">
 												<div class="d-flex flex-row icons d-flex align-items-center">
-													<i class="fa fa-heart"></i> <i class="fa fa-smile-o ml-2"></i>
+													<form th:action="@{../u/post/react}" method="POST">
+														<input type="hidden" name="postID" th:value="${post.id}"/>
+														<th:block th:if="${not post.isLiked(userDTO.username)}">
+															<input type="hidden" name="action" value="like"/>
+															<button type="submit" value="Like" class="btn shadow" style="border: 1px solid blue;">
+																<span style="color:blue;">Like&nbsp;</span>
+																<img src="../img/like.svg" height="20px" style="margin-bottom: 10%;"> 	
+															</button>															
+														</th:block>
+														<th:block th:if="${post.isLiked(userDTO.username)}">
+															<input type="hidden" name="action" value="dislike"/>
+															<button type="submit" value="Dislike" class="btn shadow" style="border: 1px solid red;">
+																<span style="color:red;">Dislike&nbsp;</span>
+																<img src="../img/dislike.svg" height="20px" style="margin-bottom: 5%;"> 	
+															</button>
+														</th:block>
+													</form>
 												</div>
 												<div class="d-flex flex-row muted-color">
-													<span th:text="${post.comments.size()}"></span><span>&nbsp;comments</span><span
-														class="ml-2">Share</span>
+													<span th:text="${post.comments.size()}"></span><span>&nbsp;comments</span>
+													<span>&nbsp;&nbsp;</span>
+													<th:block th:if="${post.reactions.size() gt 1}">
+														<span th:text="${post.reactions.size()}"></span><span>&nbsp;likes</span>
+													</th:block>		
+													<th:block th:if="${post.reactions.size() lt 2}">
+														<span th:text="${post.reactions.size()}"></span><span>&nbsp;like</span>
+													</th:block>
 												</div>
 											</div>
 											<hr>
-											<div class="comments">
+											<input type="button" class="btn btn-primary shadow" style="margin-left: 40%;" th:id="${'button-comment-' +post.id}" value="View comments" th:attr="onclick=|display('div-comment-${post.id}'); display('button-comment-${post.id}')|"/>
+											<div class="comments" style="display: none;" th:id="${'div-comment-' +post.id}">
 												<th:block th:each="comment : ${post.comments}" th:if="${comment.status}">
 													<div class="d-flex flex-row mb-2">
 														<img th:src="${comment.user.avatarLink}" width="40"
@@ -439,7 +471,16 @@
 																</video>
 															</th:block>
 															<div class="d-flex flex-row align-items-center status">
-																<small>Like</small> <small>Reply</small> <small>Translate</small>
+																<th:block th:if="${userDTO.username eq comment.user.username}">				
+																		<form th:action="@{/u/comment/delete}" method="POST" enctype="multipart/form-data">
+																		<small>
+																			<input type="hidden" name="txtCommentID" th:value="${comment.id}" />
+																			<input type="hidden" name="txtPostID" th:value="${post.id}" />
+																			<input type="submit" class="btn btn-link" value="Delete" onclick="return confirm_delete()" /> 
+																		</small>
+																		</form>
+																</th:block>
+																
 																<small>
 																	<span th:text="${comment.dateUpdated}"></span>&nbsp;at&nbsp;<span th:text="${comment.timeUpdated}"></span>
 																</small>
@@ -451,11 +492,11 @@
 												<div class="comment-input">
 														<input type="text" name="commentContent" class="form-control">
 														<div class="fonts">
-															<span class="fa fa-camera" onclick="display('divCommentMedia')"></span>
+															<span class="fa fa-camera" th:attr="onclick=|display('div-comment-media-${post.id}')|"></span>
 														</div>
 													
 												</div>
-												<div style="display: none; margin-left: 3%; margin-top: 1%;" id="divCommentMedia">
+												<div style="display: none; margin-left: 3%; margin-top: 1%;" th:id="${'div-comment-media-' + post.id}">
 													<input onchange="Filevalidation3()" type="file" id="inpMedia"
 															accept="image/png, image/jpeg, image/jpg, image/gif, video/mp4" name="commentMedia"/>
 													<span id="sizeMedia"></span>

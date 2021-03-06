@@ -141,6 +141,30 @@ public class UserController {
 		}
 	}
 	
+	@PostMapping("/profile/updateName")
+	public String updateName(Model model, Principal principal, 
+			@RequestParam("txtFullname") String name, HttpServletRequest request) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(name != null && !name.isEmpty()) {
+				userRepo.updateName(userdetails.getUsername(), name);
+				
+				User userDTO = userdetails.getUser();
+				userDTO.setFullname(name);
+				userdetails.setUser(userDTO);
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userdetails, null, userdetails.getAuthorities());
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+				return "redirect:/u/profile?message=" + env.getProperty("success");		
+			} else {
+				return "redirect:/error/" + env.getProperty("invalid");
+			}
+		} catch (Exception e) {
+			return "redirect:/error/" + env.getProperty("invalid");
+		}
+	}
+	
 	@PostMapping("/comment/delete")
 	public String deleteComment(Model model, Principal principal, 
 			@RequestParam("txtCommentID") int commentID,

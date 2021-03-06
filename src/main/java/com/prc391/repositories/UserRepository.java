@@ -40,6 +40,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	@Query(value = "UPDATE [user] set gmail = ?2 WHERE username = ?1", nativeQuery = true)
 	void updateGoogle(String username, String google);
 	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE [user] set fullname = ?2 WHERE username = ?1", nativeQuery = true)
+	void updateName(String username, String name);
+	
 	@Query(value = "SELECT * FROM [user]", nativeQuery = true)
 	List<User> findAll();
 	
