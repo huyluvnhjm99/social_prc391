@@ -165,6 +165,23 @@ public class UserController {
 		}
 	}
 	
+	@RequestMapping("/profile/deleteGmail")
+	public String deleteComment(Model model, Principal principal, HttpServletRequest request) {
+		try {
+			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			userRepo.updateGoogle(userdetails.getUsername(), null);
+			
+			User userDTO = userdetails.getUser();
+			userDTO.setGmail(null);
+			userdetails.setUser(userDTO);
+			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userdetails, null, userdetails.getAuthorities());
+			authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			return "redirect:/u/profile?message=" + env.getProperty("success");		
+		} catch (Exception e) {
+			return "redirect:/error/" + env.getProperty("invalid");
+		}
+	}
+	
 	@PostMapping("/comment/delete")
 	public String deleteComment(Model model, Principal principal, 
 			@RequestParam("txtCommentID") int commentID,

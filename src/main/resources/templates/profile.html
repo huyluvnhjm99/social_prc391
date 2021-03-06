@@ -322,17 +322,20 @@
 							<div class="div-line-info">
 								<img src="../img/name.svg" width="20" style="margin-right: 20px;" />
 								<span th:text="${user.fullname}" id="spanName"></span>
-								<form th:action="@{/u/profile/updateName}" method="POST">
-									<input type="button" class="btn btn-primary" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('btnUpdate');"/> 
+								&nbsp;&nbsp;<input type="button" class="btn btn-primary" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('btnUpdate');"/> 
+								<form th:action="@{/u/profile/updateName}" method="POST">					
 									<input type="text" name="txtFullname" required min="6" id="inputName" th:value="${user.fullname}" style="display: none;"/>
 									<input type="submit" class="btn btn-primary" id="btnUpdate" style="display: none;" value="Update"/>	
 								</form>					
-							<br/></div>
+							</div>
 							<div class="div-line-info">
 							<img src="../img/birthday.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.birthdate}"></span><br/>
 							</div>
 							<div class="div-line-info">
-							<img src="../img/gmail.svg" width="20" style="margin-right: 20px;" /> <span th:text="${user.gmail}"></span>
+							<img src="../img/gmail.svg" width="20" style="margin-right: 20px;" /> 
+							<th:block th:if="${user.gmail ne null}">
+								<span th:text="${user.gmail}"></span>&nbsp;&nbsp;<a href="../u/profile/deleteGmail" onclick="return confirm_delete()" class="btn btn-danger">Detele</a>
+							</th:block>
 							<th:block th:if="${user.gmail eq null}">
 								<a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/u/google&response_type=code
     &client_id=107600830171-em5t8i3sfm86tdk7th0i1ekaav0vldgo.apps.googleusercontent.com&approval_prompt=force">Connect with Gmail</a>
@@ -686,6 +689,11 @@
 	<script>
 	 $(window).on('load', showMessage());
 	</script>
+	<script>
+    	function confirm_delete() {
+        	return confirm('Are you sure to delete?');
+        }
+    </script>
 </body>
 
 </html>
