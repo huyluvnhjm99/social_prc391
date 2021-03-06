@@ -98,14 +98,13 @@
 					</button>
 
 					<!-- Topbar Search -->
-					<form
-						class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+					<form th:action="@{/u/homepage}" method="GET" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
 						<div class="input-group">
 							<input type="text" class="form-control bg-light border-0 small"
 								placeholder="Search for..." aria-label="Search"
-								aria-describedby="basic-addon2">
+								aria-describedby="basic-addon2" name="txtSearch"/>
 							<div class="input-group-append">
-								<button class="btn btn-primary" type="button">
+								<button class="btn btn-primary" type="submit">
 									<i class="fas fa-search fa-sm"></i>
 								</button>
 							</div>
@@ -324,6 +323,21 @@
 							</form>
 							
 							</div>
+					<div style="width: 100%; float: left;">
+						<th:block th:each="user : ${listUsers}">
+						<div class="card shadow" style="width: 30%; margin-left: 3%; margin-top: 2%; height: 180px; text-align:center; float: left;">
+							<div style="float: left;">
+								<img th:src="${user.avatarLink}" style="height: 100px; margin-top: 5%;"/>
+							</div>
+							<div style="float: left;">
+								<span th:text="${user.fullname}"></span>
+							</div>
+							<a th:href="${'../u/profile?username='+ user.username}" class="btn btn-primary">View Profile</a>
+						</div>
+					</th:block>
+					</div>
+					<hr/>
+					<div style="width: 100%; float: left;">
 					<th:block th:each="post : ${listPosts}">
 						<div class="container mt-5 mb-5">
 							<div class="row d-flex align-items-center justify-content-center">
@@ -360,8 +374,8 @@
 										<div class="p-2">
 											<span class="text-justify" th:text="${post.content}"></span><br />
 											<div th:if="${post.imageLink != null}">
-											<img th:src="${post.imageLink}" class="img-fluid">
-										</div>
+												<img th:src="${post.imageLink}" class="img-fluid">
+											</div>
 										<div th:if="${post.videoLink != null}">
 											<video style="width: 60%; margin-left: 20%;" width="480" height="320" controls>
 												<source th:src="${post.videoLink}" class="img-fluid" type="video/mp4">
@@ -455,7 +469,7 @@
 							</div>
 						</div>
 					</th:block>
-
+				</div>
 				</div>
 				<!-- End of Main Content -->
 

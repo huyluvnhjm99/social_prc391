@@ -74,7 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable().authorizeRequests();
 			
 		// Các trang không yêu cầu login
-		http.authorizeRequests().antMatchers("/", "/a/**", "/error", "/static/**", "/a", "/google").permitAll();
+		http.authorizeRequests().antMatchers("/", "/a/**", "/error", "/static/**", "/a", "/google", "/logout").permitAll();
 		
 
 		// Trang /userInfo yêu cầu phải login với vai trò ROLE_USER hoặc ROLE_ADMIN.

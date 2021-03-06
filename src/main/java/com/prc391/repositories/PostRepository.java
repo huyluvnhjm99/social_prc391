@@ -21,6 +21,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 	@Query(value = "SELECT * FROM [post] WHERE status = ?1 AND user_username=?2 ORDER BY [date_updated] DESC, [time_updated] DESC", nativeQuery = true)
 	List<Post> findByUsername(boolean status, String username);
 	
+	@Query(value = "SELECT * FROM [post] WHERE status = ?1 AND post_content LIKE %?2% ORDER BY [date_updated] DESC, [time_updated] DESC", nativeQuery = true)
+	List<Post> findByLikeName(boolean status, String search);
+	
 	@Transactional
 	@Modifying
 	@Query(value = "UPDATE [post] set status = ?2 WHERE id = ?1", nativeQuery = true)

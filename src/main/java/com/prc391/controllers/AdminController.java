@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.prc391.models.Post;
+import com.prc391.models.User;
 import com.prc391.models.UserDetails;
 import com.prc391.repositories.CommentRepository;
 import com.prc391.repositories.PostRepository;
@@ -37,21 +38,43 @@ public class AdminController {
 	private PostRepository postRepo;
 	
 	@Autowired
+	private UserRepository userRepo;
+	
+	@Autowired
 	private Environment env;
 	
 	@RequestMapping("/admin") 
     public String homepage(Model model, Principal principal,
+    		@Nullable @RequestParam(required = false, name = "txtSearch") String search,
     		@Nullable @RequestParam(required = false, name = "message") String message,
     		@Nullable @RequestParam(required = false, name = "imessage") String imessage){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
 		
-		List<Post> listPost = postService.loadAllPost();
-		for (int i = 0; i < listPost.size(); i++) {
-			if(listPost.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
-				listPost.get(i).setDateUpdated(null);
+		List<Post> listPosts; List<User> listUsers = null;
+		
+		if(search == null) {
+			listPosts = postService.loadAllPost();
+			for (int i = 0; i < listPosts.size(); i++) {
+				if(listPosts.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
+					listPosts.get(i).setDateUpdated(null);
+				}
 			}
+		} else {
+			listPosts = postRepo.findByLikeName(true, search);
+			for (int i = 0; i < listPosts.size(); i++) {
+				if(listPosts.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
+					listPosts.get(i).setDateUpdated(null);
+				}
+			}
+			
+			listUsers = userRepo.findByLikeName(search);
 		}
-		model.addAttribute("listPosts", listPost);
+		
+		if(listUsers != null) {
+			model.addAttribute("listUsers", listUsers);
+		}
+		model.addAttribute("txtSearch", search);
+		model.addAttribute("listPosts", listPosts);
 		model.addAttribute("userDTO", userdetails.getUser());
 		if(message != null)
 			model.addAttribute("message", message);
@@ -59,6 +82,18 @@ public class AdminController {
 			model.addAttribute("imessage", imessage);
         return "admin"; 
     }
+	
+	@RequestMapping("/disableUser")
+	public String disableUser(Model model, Principal principal, 
+			@RequestParam("username") String username,
+			@RequestParam("search") String search) {
+		try {
+			userRepo.updateStatus(username, false);
+			return "redirect:/d/admin?message=" + env.getProperty("success") + "&txtSearch=" + search;
+		} catch (Exception e) {
+			return "redirect:/error/" + env.getProperty("invalid");
+		}
+	}
 	
 	@RequestMapping("/comment/delete/{commentID}")
 	public String deleteComment(Model model, Principal principal, 

@@ -30,6 +30,7 @@ import com.prc391.models.User;
 import com.prc391.models.UserDetails;
 import com.prc391.models.dto.GooglePojo;
 import com.prc391.repositories.CommentRepository;
+import com.prc391.repositories.PostRepository;
 import com.prc391.repositories.ReactionRepository;
 import com.prc391.repositories.UserRepository;
 import com.prc391.service.PostServiceImpl;
@@ -50,6 +51,9 @@ public class UserController {
 	private CommentRepository commentRepo;
 	
 	@Autowired
+	private PostRepository postRepo;
+	
+	@Autowired
 	private PostServiceImpl postService;
 	
 	@Autowired
@@ -59,18 +63,39 @@ public class UserController {
     public String homepage(Model model, Principal principal,
     		@Nullable @RequestParam(required = false, name = "message") String message,
     		@Nullable @RequestParam(required = false, name = "imessage") String imessage,
+    		@Nullable @RequestParam(required = false, name = "txtSearch") String search,
     		@Nullable @RequestParam("invImg") String invImg, 
     		@Nullable @RequestParam("invVid") String invVid){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
-		
-		List<Post> listPost = postService.loadAllPost();
-		for (int i = 0; i < listPost.size(); i++) {
-			if(listPost.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
-				listPost.get(i).setDateUpdated(null);
-			}
+		if(!userRepo.checkStatus(userdetails.getUsername())) {
+			return "redirect:/logout";
 		}
-		model.addAttribute("listPosts", listPost);
+		
+		List<Post> listPosts; List<User> listUsers = null;
+		
+		if(search == null) {
+			listPosts = postService.loadAllPost();
+			for (int i = 0; i < listPosts.size(); i++) {
+				if(listPosts.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
+					listPosts.get(i).setDateUpdated(null);
+				}
+			}
+		} else {
+			listPosts = postRepo.findByLikeName(true, search);
+			for (int i = 0; i < listPosts.size(); i++) {
+				if(listPosts.get(i).getDateUpdated().toString().compareToIgnoreCase(new Date(System.currentTimeMillis()).toString()) == 0) {
+					listPosts.get(i).setDateUpdated(null);
+				}
+			}
+			
+			listUsers = userRepo.findByLikeName(search);
+		}
+		
+		model.addAttribute("listPosts", listPosts);
 		model.addAttribute("userDTO", userdetails.getUser());
+		if(listUsers != null) {
+			model.addAttribute("listUsers", listUsers);
+		}
 		if(invVid != null)
 			model.addAttribute("invVid", invVid);
 		if(invImg != null)
@@ -87,6 +112,10 @@ public class UserController {
     		@Nullable @RequestParam(required = false, name = "message") String message,
     		@Nullable @RequestParam(required = false, name = "imessage") String imessage){
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+		if(!userRepo.checkStatus(userdetails.getUsername())) {
+			return "redirect:/logout";
+		}
+		
 		List<Post> listPost;
 		if(username != null) {
 			listPost = postService.loadByUsername(username);
@@ -115,6 +144,10 @@ public class UserController {
 			@RequestParam("code") String code, HttpServletRequest request) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
+			
 			if(code != null && !code.isEmpty()) {
 				String accessToken = GoogleUtils.getToken(code, env.getProperty("google.redirect.uri.connect"), env);
 				GooglePojo googleAccountDTO = GoogleUtils.getUserInfo(accessToken, env);
@@ -146,6 +179,9 @@ public class UserController {
 			@RequestParam("txtFullname") String name, HttpServletRequest request) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			if(name != null && !name.isEmpty()) {
 				userRepo.updateName(userdetails.getUsername(), name);
 				
@@ -169,6 +205,9 @@ public class UserController {
 	public String deleteComment(Model model, Principal principal, HttpServletRequest request) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			userRepo.updateGoogle(userdetails.getUsername(), null);
 			
 			User userDTO = userdetails.getUser();
@@ -188,6 +227,9 @@ public class UserController {
 			@RequestParam("txtPostID") int postID) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			if(commentRepo.update(commentID, postID, userdetails.getUsername(), false) == 1) {
 				return "redirect:/u/homepage?message=" + env.getProperty("success");
 			} else {
@@ -204,6 +246,9 @@ public class UserController {
 			@RequestParam("postID") int postID,
 			@Nullable @RequestParam("commentMedia") MultipartFile media) {
 		UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+		if(!userRepo.checkStatus(userdetails.getUsername())) {
+			return "redirect:/logout";
+		}
 		try {
 			if(content == null) {
 				content = "";
@@ -244,6 +289,9 @@ public class UserController {
 				content = "";
 			
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			String imageLink = null, videoLink = null;
 			
 			if(image != null && !image.isEmpty()) {
@@ -287,6 +335,9 @@ public class UserController {
     		@PathVariable int id) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			Post postDTO = postService.findOne(id);
 			if(postDTO != null) {
 				if(postDTO.getUser().getUsername().compareTo(userdetails.getUsername()) == 0) {
@@ -312,6 +363,9 @@ public class UserController {
     		HttpServletRequest request) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			String imageLink = null;
 			if(image != null && !image.isEmpty()) {
 				if(image.getContentType().contains("image")) {
@@ -348,6 +402,9 @@ public class UserController {
     		@RequestParam("action") String action) {
 		try {
 			UserDetails userdetails = (UserDetails) ((Authentication) principal).getPrincipal();
+			if(!userRepo.checkStatus(userdetails.getUsername())) {
+				return "redirect:/logout";
+			}
 			Reaction reaction = reactionRepo.getUserReactionByPostID(userdetails.getUsername(), postID);
 			
 			if(action.compareTo("like") == 0) {
@@ -377,4 +434,5 @@ public class UserController {
 			return "redirect:/error/" + env.getProperty("invalid");
 		}
 	}
+	
 }

@@ -22,8 +22,15 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 			+ "FROM [user] WHERE username = ?1 AND status = 'true'", nativeQuery = true)
 	User findByUsername(String username);
 	
+	@Query(value = "SELECT status FROM [user] WHERE username = ?1", nativeQuery = true)
+	boolean checkStatus(String username);
+	
 	@Query(value = "SELECT username FROM [user] WHERE username = ?1", nativeQuery = true)
 	String findExisted(String username);
+	
+	@Query(value = "SELECT * FROM [user] "
+			+ "WHERE fullname LIKE %?1% AND status = 'true' AND role = 'user'", nativeQuery = true)
+	List<User> findByLikeName(String search);
 	
 	@Transactional
 	@Modifying

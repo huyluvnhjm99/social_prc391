@@ -322,11 +322,13 @@
 							<div class="div-line-info">
 								<img src="../img/name.svg" width="20" style="margin-right: 20px;" />
 								<span th:text="${user.fullname}" id="spanName"></span>
-								&nbsp;&nbsp;<input type="button" class="btn btn-primary" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('btnUpdate');"/> 
-								<form th:action="@{/u/profile/updateName}" method="POST">					
-									<input type="text" name="txtFullname" required min="6" id="inputName" th:value="${user.fullname}" style="display: none;"/>
-									<input type="submit" class="btn btn-primary" id="btnUpdate" style="display: none;" value="Update"/>	
-								</form>					
+								<th:block th:if="${user.username eq userDTO.username}">
+									&nbsp;&nbsp;<input type="button" class="btn btn-primary shadow" value="Change" id="btnChange" onclick="display('spanName'); display('btnChange'); display('inputName'); display('btnUpdate');"/>
+									<form th:action="@{/u/profile/updateName}" method="POST">					
+										<input type="text" name="txtFullname" required min="6" id="inputName" th:value="${user.fullname}" style="display: none;"/>
+										<input type="submit" class="btn btn-primary shadow" id="btnUpdate" style="display: none;" value="Update"/>	
+									</form>	
+								</th:block> 				
 							</div>
 							<div class="div-line-info">
 							<img src="../img/birthday.svg" width="20" style="margin-right: 20px;" /><span th:text="${user.birthdate}"></span><br/>
@@ -334,9 +336,10 @@
 							<div class="div-line-info">
 							<img src="../img/gmail.svg" width="20" style="margin-right: 20px;" /> 
 							<th:block th:if="${user.gmail ne null}">
-								<span th:text="${user.gmail}"></span>&nbsp;&nbsp;<a href="../u/profile/deleteGmail" onclick="return confirm_delete()" class="btn btn-danger">Detele</a>
+								<span th:text="${user.gmail}"></span>
+								&nbsp;&nbsp;<a th:if="${user.username eq userDTO.username}" href="../u/profile/deleteGmail" onclick="return confirm_delete()" class="btn btn-danger shadow">Detele</a>
 							</th:block>
-							<th:block th:if="${user.gmail eq null}">
+							<th:block th:if="${user.gmail eq null and user.username eq userDTO.username}">
 								<a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8084/u/google&response_type=code
     &client_id=107600830171-em5t8i3sfm86tdk7th0i1ekaav0vldgo.apps.googleusercontent.com&approval_prompt=force">Connect with Gmail</a>
 							</th:block><br/>
