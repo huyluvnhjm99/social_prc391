@@ -39,7 +39,7 @@ public class MailActivator {
             message.setSubject("Activation: Activate your SocialPRC391 account!");
             //message.setText("Your activation code is: " + code);
             message.setText("Click the link here to activate your account: "
-                    + "\nhttp://localhost:8084/a/activation?code=" + code + "&email=" + email);
+                    + "\nhttps://www.socialprc391.tk/a/activation?code=" + code + "&email=" + email);
             Transport.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
