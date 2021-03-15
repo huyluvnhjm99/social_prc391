@@ -307,8 +307,8 @@
 							<img style="min-width: 150px; width: 50%;" class="" th:src="${user.avatarLink}" /><br/>
 							<th:block th:if="${user.username eq userDTO.username}">
 							<form th:action="@{../u/profile/avatar}" method="POST" enctype="multipart/form-data">
-								<input type="button" onclick="display('divImg'); display('btnAvatar')" id="btnAvatar" class="btn shadow" style="border: 1px solid #4e73df; border-radius: 5px;" value="Change avatar"/>
-									<div id="divImg" style="display: none;">
+								<input type="button" onclick="display('divImgs'); display('btnAvatar')" id="btnAvatar" class="btn shadow" style="border: 1px solid #4e73df; border-radius: 5px;" value="Change avatar"/>
+									<div id="divImgs" style="display: none;">
 										<input type="button" class="btn btn-danger" value="close" onclick="display('divImg'); display('btnAvatar')"/><br/>
 			                        	Upload new avatar (Max 4mb): <input onchange="Filevalidation1()" style="width: 200px;"  
 			                        	type="file" id="inpImg" accept="image/png, image/jpeg, image/jpg, image/gif" name="imageLink" required="required"/>	
