@@ -17,7 +17,7 @@ public class MailActivator {
         String to = email;//change accordingly    
         String from = "hieuse61964@gmail.com";//change accordingly
         final String username = "hieuse61964@gmail.com";//change accordingly
-        final String password = "hieuhieuhieu";//change accordingly    
+        final String password = "hieuhieuhieuhieu";//change accordingly    
 
         String host = "smtp.gmail.com";
         Properties props = new Properties();
