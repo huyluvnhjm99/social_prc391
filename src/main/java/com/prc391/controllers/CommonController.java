@@ -65,6 +65,19 @@ public class CommonController {
 		model.addAttribute("userForm", new User());
 		return "register";
 	}
+	
+	@RequestMapping("/madao")
+	public String madao() {
+		try {
+			String username = "datpro03971@gmail.com";
+			String activationCode = activationService.createActivationRecord(username);
+			MailActivator.sendEmail(username, activationCode);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return "redirect:/login";
+	}
+	
 		
 	@PostMapping("/register")
 	public String registerNew(@ModelAttribute("userForm") User userForm, BindingResult bindingResult, Model model) {
