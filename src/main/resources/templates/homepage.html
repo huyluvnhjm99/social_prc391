@@ -406,10 +406,10 @@
 													<span th:text="${post.comments.size()}"></span><span>&nbsp;comments</span>
 													<span>&nbsp;&nbsp;</span>
 													<th:block th:if="${post.reactions.size() gt 1}">
-														<span th:text="${post.reactions.size()}"></span><span>&nbsp;likes</span>
+														<span th:text="${post.reactions.size()}"></span><span>&nbsp;reactions</span>
 													</th:block>		
 													<th:block th:if="${post.reactions.size() lt 2}">
-														<span th:text="${post.reactions.size()}"></span><span>&nbsp;like</span>
+														<span th:text="${post.reactions.size()}"></span><span>&nbsp;reaction</span>
 													</th:block>
 												</div>
 											</div>
